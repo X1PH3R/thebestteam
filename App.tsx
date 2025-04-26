@@ -1,40 +1,24 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import HomeScreen from './src/screens/HomeScreen';
-import ClubsScreen from './src/screens/ClubsScreen';
-import EventsScreen from './src/screens/EventsScreen';
+import { View, Text, StyleSheet } from 'react-native';
 
-export type RootStackParamList = {
-  Home: undefined;
-  Clubs: undefined;
-  Events: undefined;
-};
-
-const Stack = createNativeStackNavigator<RootStackParamList>();
-
-function App(): React.JSX.Element {
+export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen 
-          name="Home" 
-          component={HomeScreen}
-          options={{title: 'SJU Connect'}}
-        />
-        <Stack.Screen 
-          name="Clubs" 
-          component={ClubsScreen}
-          options={{title: 'Clubs'}}
-        />
-        <Stack.Screen 
-          name="Events" 
-          component={EventsScreen}
-          options={{title: 'Events'}}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <View style={styles.container}>
+      <Text style={styles.text}>Hello from SJU Connect!</Text>
+    </View>
   );
 }
 
-export default App; 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+  },
+  text: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#cc0000',
+  },
+}); 
