@@ -1,11 +1,24 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
+
+const clubs = [
+  { id: '1', name: 'Computer Science Club' },
+  { id: '2', name: 'Business Leaders Society' },
+];
 
 export default function ClubsScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Clubs</Text>
-      <Text style={styles.subtitle}>Coming soon!</Text>
+      <FlatList
+        data={clubs}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.clubItem}>
+            <Text style={styles.clubName}>{item.name}</Text>
+          </View>
+        )}
+      />
     </View>
   );
 }
@@ -13,19 +26,31 @@ export default function ClubsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
     backgroundColor: '#f0f4f7',
   },
   title: {
     fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
     color: '#cc0000',
   },
-  subtitle: {
-    fontSize: 18,
-    color: '#666',
+  clubItem: {
+    padding: 15,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  clubName: {
+    fontSize: 16,
+    color: '#333',
   },
 }); 

@@ -1,24 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Hello from SJU Connect!</Text>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
+      <Text style={{ fontSize: 24, color: 'black' }}>Hello, this is SJU Connect!</Text>
     </View>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#cc0000',
-  },
-}); 
+} 
