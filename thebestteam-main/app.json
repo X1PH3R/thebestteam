@@ -1,0 +1,25 @@
+{
+  "name": "thebestteam",
+  "displayName": "thebestteam",
+  "expo": {
+    "name": "St. John's Student Life",
+    "slug": "stjohns-student-life",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#C41E3A"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#C41E3A"
+      }
+    }
+  }
+}
