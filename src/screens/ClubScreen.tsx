@@ -15,6 +15,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 type RootStackParamList = {
   Clubs: undefined;
   Events: undefined;
+  ClubDetails: { club: any };
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -26,7 +27,22 @@ const CLUBS = [
     description: 'Capture moments and share your passion for photography',
     members: 42,
     category: 'Arts',
-    imageUrl: 'https://picsum.photos/200/200'
+    imageUrl: 'https://picsum.photos/200/200',
+    meetingTimes: [
+      {
+        day: 'Monday',
+        time: '6:00 PM',
+        location: 'Room 101',
+        frequency: 'Weekly'
+      },
+      {
+        day: 'Thursday',
+        time: '7:00 PM',
+        location: 'Room 101',
+        frequency: 'Weekly'
+      }
+    ],
+    calendarLink: 'https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=XXXXX'
   },
   {
     id: '2',
@@ -34,7 +50,16 @@ const CLUBS = [
     description: 'Strategic thinking and competitive chess matches',
     members: 28,
     category: 'Games',
-    imageUrl: 'https://picsum.photos/200/201'
+    imageUrl: 'https://picsum.photos/200/201',
+    meetingTimes: [
+      {
+        day: 'Wednesday',
+        time: '5:00 PM',
+        location: 'Room 203',
+        frequency: 'Weekly'
+      }
+    ],
+    calendarLink: 'https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=YYYYY'
   },
   {
     id: '3',
@@ -42,7 +67,16 @@ const CLUBS = [
     description: 'Explore nature and stay active with group hikes',
     members: 56,
     category: 'Sports',
-    imageUrl: 'https://picsum.photos/200/202'
+    imageUrl: 'https://picsum.photos/200/202',
+    meetingTimes: [
+      {
+        day: 'Saturday',
+        time: '9:00 AM',
+        location: 'Various Locations',
+        frequency: 'Weekly'
+      }
+    ],
+    calendarLink: 'https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=ZZZZZ'
   },
   {
     id: '4',
@@ -50,7 +84,16 @@ const CLUBS = [
     description: 'Monthly book discussions and literary analysis',
     members: 35,
     category: 'Arts',
-    imageUrl: 'https://picsum.photos/200/203'
+    imageUrl: 'https://picsum.photos/200/203',
+    meetingTimes: [
+      {
+        day: 'First Tuesday',
+        time: '7:00 PM',
+        location: 'Library Room A',
+        frequency: 'Monthly'
+      }
+    ],
+    calendarLink: 'https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=WWWWW'
   }
 ];
 
@@ -81,7 +124,7 @@ const ClubScreen = () => {
             <TouchableOpacity 
               key={club.id}
               style={styles.clubCard}
-              onPress={() => navigation.navigate('Events')}
+              onPress={() => navigation.navigate('ClubDetails', { club })}
             >
               <Image
                 source={{ uri: club.imageUrl }}
