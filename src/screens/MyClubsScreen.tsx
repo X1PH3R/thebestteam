@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Linking } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useJoinedClubs } from '../context/JoinedClubsContext';
+import { Agenda } from 'react-native-calendars';
+import type { Club } from '../context/JoinedClubsContext';
 
 type RootStackParamList = {
   MyClubs: { joinedClub?: any };
@@ -20,31 +22,36 @@ type TabParamList = {
 type NavigationProp = NativeStackNavigationProp<RootStackParamList> & BottomTabNavigationProp<TabParamList>;
 type MyClubsRouteProp = RouteProp<RootStackParamList, 'MyClubs'>;
 
-interface Club {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
-  image: any;
-  memberCount: number;
-  meetingTimes: Array<{
-    day: string;
-    time: string;
-    location: string;
-    frequency: string;
-  }>;
-  calendarLink: string;
-  upcomingEvents: Array<{
-    title: string;
-    date: string;
-    description: string;
-  }>;
+interface Meeting {
+  day: string;
+  time: string;
+  location: string;
+  frequency: string;
 }
 
 const MyClubsScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<MyClubsRouteProp>();
   const { joinedClubs } = useJoinedClubs();
+
+  // Prepare agenda items
+  const agendaItems = useMemo(() => {
+    const items: Record<string, any[]> = {};
+    joinedClubs.forEach(club => {
+      (club.meetingTimes ?? []).forEach(meeting => {
+        // We'll use the next upcoming date for each meeting (for demo, use today)
+        // In a real app, you'd calculate the next occurrence based on day/frequency
+        const today = new Date();
+        const dayOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].indexOf(meeting.day);
+        let date = new Date(today);
+        date.setDate(today.getDate() + ((dayOfWeek - today.getDay() + 7) % 7));
+        const dateString = date.toISOString().split('T')[0];
+        if (!items[dateString]) items[dateString] = [];
+        items[dateString].push({ club, meeting });
+      });
+    });
+    return items;
+  }, [joinedClubs]);
 
   // Handle new club from navigation params
   React.useEffect(() => {
@@ -75,49 +82,36 @@ const MyClubsScreen = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>My Clubs</Text>
-      </View>
-      <View style={styles.clubList}>
-        {joinedClubs.map((club, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.clubCard}
-            onPress={() => navigation.navigate('ClubDetails', { club })}
-          >
-            <Image source={typeof club.image === 'string' ? { uri: club.image } : club.image} style={styles.clubImage} />
-            <View style={styles.clubInfo}>
-              <Text style={styles.clubName}>{club.name}</Text>
-              <Text style={styles.clubCategory}>{club.category}</Text>
-              <Text style={styles.clubDescription} numberOfLines={2}>
-                {club.description}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View>
-      {joinedClubs.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Upcoming Meetings</Text>
-          {joinedClubs.map((club) => (
-            (club.meetingTimes ?? []).map((meeting, idx) => (
-              <View key={club.id + '-meeting-' + idx} style={styles.eventCard}>
-                <Text style={styles.eventTitle}>{club.name}</Text>
-                <Text style={styles.eventDate}>{meeting.day} • {meeting.time}</Text>
-                <Text style={styles.eventDescription}>{meeting.location} ({meeting.frequency})</Text>
-                {club.calendarLink && (
-                  <TouchableOpacity onPress={() => Linking.openURL(club.calendarLink)} style={styles.googleCalendarButton}>
-                    <Ionicons name="logo-google" size={16} color="#fff" />
-                    <Text style={styles.googleCalendarButtonText}>Add to Google Calendar</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            ))
-          ))}
+    <Agenda
+      items={agendaItems}
+      renderItem={(
+        { club, meeting }: { club: Club; meeting: Meeting },
+        isFirst: boolean
+      ) => (
+        <View style={styles.eventCard}>
+          <Text style={styles.eventTitle}>{club.name}</Text>
+          <Text style={styles.eventDate}>{meeting.day} • {meeting.time}</Text>
+          <Text style={styles.eventDescription}>{meeting.location} ({meeting.frequency})</Text>
+          {club.calendarLink && (
+            <TouchableOpacity onPress={() => Linking.openURL(club.calendarLink)} style={styles.googleCalendarButton}>
+              <Ionicons name="logo-google" size={16} color="#fff" />
+              <Text style={styles.googleCalendarButtonText}>Add to Google Calendar</Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
-    </ScrollView>
+      renderEmptyDate={() => (
+        <View style={styles.eventCard}>
+          <Text style={styles.eventDescription}>No meetings for this day.</Text>
+        </View>
+      )}
+      theme={{
+        agendaDayTextColor: '#007AFF',
+        agendaDayNumColor: '#007AFF',
+        agendaTodayColor: '#007AFF',
+        agendaKnobColor: '#007AFF',
+      }}
+    />
   );
 };
 

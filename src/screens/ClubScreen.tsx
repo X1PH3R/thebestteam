@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   View, 
   Text, 
@@ -8,7 +8,7 @@ import {
   TextInput,
   Image
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
@@ -25,9 +25,15 @@ const CLUBS = [
     id: '1',
     name: 'Photography Club',
     category: 'Arts',
-    members: 45,
+    memberCount: 45,
     description: 'Join us to explore the world through your lens!',
-    imageUrl: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Y2hpYHx8&auto=format&fit=crop&w=1638&q=80',
+    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Y2hpYHx8&auto=format&fit=crop&w=1638&q=80',
+    members: [
+      { id: 1, name: 'John Doe', role: 'President', imageUrl: 'https://via.placeholder.com/50' },
+      { id: 2, name: 'Jane Smith', role: 'Vice President', imageUrl: 'https://via.placeholder.com/50' },
+      { id: 3, name: 'Mike Johnson', role: 'Treasurer', imageUrl: 'https://via.placeholder.com/50' },
+      { id: 4, name: 'Sarah Wilson', role: 'Member', imageUrl: 'https://via.placeholder.com/50' }
+    ],
     meetingTimes: [
       { day: 'Monday', time: '3:00 PM', location: 'Room 101', frequency: 'Weekly' },
       { day: 'Thursday', time: '3:00 PM', location: 'Room 101', frequency: 'Weekly' }
@@ -38,9 +44,13 @@ const CLUBS = [
     id: '2',
     name: 'Chess Club',
     category: 'Games',
-    members: 30,
+    memberCount: 30,
     description: 'Challenge your mind and make new friends!',
-    imageUrl: 'https://images.unsplash.com/photo-1529307473937-262d4b6c0c0e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Y2hpYHx8&auto=format&fit=crop&w=1638&q=80',
+    image: 'https://images.unsplash.com/photo-1517524285303-d6fc683dddf8?auto=format&fit=crop&w=800&q=80',
+    members: [
+      { id: 1, name: 'Alice Brown', role: 'President', imageUrl: 'https://via.placeholder.com/50' },
+      { id: 2, name: 'Bob White', role: 'Vice President', imageUrl: 'https://via.placeholder.com/50' }
+    ],
     meetingTimes: [
       { day: 'Wednesday', time: '4:00 PM', location: 'Room 203', frequency: 'Weekly' }
     ],
@@ -50,9 +60,12 @@ const CLUBS = [
     id: '3',
     name: 'Hiking Club',
     category: 'Outdoors',
-    members: 60,
+    memberCount: 60,
     description: 'Explore nature and stay active!',
-    imageUrl: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Y2hpYHx8&auto=format&fit=crop&w=1638&q=80',
+    image: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Y2hpYHx8&auto=format&fit=crop&w=1638&q=80',
+    members: [
+      { id: 1, name: 'Chris Green', role: 'President', imageUrl: 'https://via.placeholder.com/50' }
+    ],
     meetingTimes: [
       { day: 'Saturday', time: '9:00 AM', location: 'Various Locations', frequency: 'Weekly' }
     ],
@@ -62,9 +75,12 @@ const CLUBS = [
     id: '4',
     name: 'Book Club',
     category: 'Literature',
-    members: 25,
+    memberCount: 25,
     description: 'Share your love for reading!',
-    imageUrl: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Y2hpYHx8&auto=format&fit=crop&w=1638&q=80',
+    image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Y2hpYHx8&auto=format&fit=crop&w=1638&q=80',
+    members: [
+      { id: 1, name: 'Emily Clark', role: 'President', imageUrl: 'https://via.placeholder.com/50' }
+    ],
     meetingTimes: [
       { day: 'Tuesday', time: '5:00 PM', location: 'Library Room A', frequency: 'Monthly' }
     ],
@@ -76,8 +92,19 @@ const ExploreScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const searchInputRef = useRef<TextInput>(null);
 
   const categories = ['All', 'Arts', 'Games', 'Outdoors', 'Literature'];
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setSearchQuery('');
+      setSelectedCategory('All');
+      if (searchInputRef.current) {
+        searchInputRef.current.blur();
+      }
+    }, [])
+  );
 
   const filteredClubs = CLUBS.filter(club => {
     const matchesSearch = club.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -95,6 +122,7 @@ const ExploreScreen = () => {
 
       <View style={styles.searchContainer}>
         <TextInput
+          ref={searchInputRef}
           style={styles.searchInput}
           placeholder="Search clubs..."
           value={searchQuery}
@@ -134,14 +162,14 @@ const ExploreScreen = () => {
             onPress={() => navigation.navigate('ClubDetails', { club })}
           >
             <Image
-              source={typeof club.imageUrl === 'string' ? { uri: club.imageUrl } : club.imageUrl}
+              source={typeof club.image === 'string' ? { uri: club.image } : club.image}
               style={styles.clubImage}
             />
             <View style={styles.clubInfo}>
               <Text style={styles.clubName}>{club.name}</Text>
               <View style={styles.clubMeta}>
                 <Text style={styles.clubCategory}>{club.category}</Text>
-                <Text style={styles.clubMembers}>{club.members} members</Text>
+                <Text style={styles.clubMembers}>{club.memberCount} members</Text>
               </View>
               <Text style={styles.clubDescription} numberOfLines={2}>
                 {club.description}

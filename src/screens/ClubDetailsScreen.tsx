@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Linking } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -46,6 +46,7 @@ interface Club {
   meetingTimes: Meeting[];
   calendarLink: string;
   upcomingEvents: Event[];
+  members?: any[];
 }
 
 // Sample member data - in a real app, this would come from your backend
@@ -101,6 +102,8 @@ const ClubDetailsScreen = () => {
   const { club } = route.params;
   const { joinClub, joinedClubs } = useJoinedClubs();
   const isJoined = joinedClubs.some(c => c.id === club.id);
+  const [imageError, setImageError] = useState(false);
+  const members = club.members && Array.isArray(club.members) && club.members.length > 0 ? club.members : sampleMembers;
 
   const handleAddToCalendar = () => {
     if (club.calendarLink) {
@@ -117,8 +120,16 @@ const ClubDetailsScreen = () => {
     <ScrollView style={styles.container}>
       {/* Header Image */}
       <View style={styles.headerImageContainer}>
-        {club.image && (
-          <Image source={typeof club.image === 'string' ? { uri: club.image } : club.image} style={styles.headerImage} />
+        {club.image && !imageError ? (
+          <Image
+            source={typeof club.image === 'string' && club.image.trim() !== '' ? { uri: club.image } : club.image}
+            style={styles.headerImage}
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <View style={[styles.headerImage, { backgroundColor: '#eee', alignItems: 'center', justifyContent: 'center' }]}> 
+            <Ionicons name="image-outline" size={64} color="#bbb" />
+          </View>
         )}
         <TouchableOpacity 
           style={styles.backButton}
@@ -143,7 +154,7 @@ const ClubDetailsScreen = () => {
         <View style={styles.membersContainer}>
           <Text style={styles.sectionTitle}>Club Members</Text>
           <View style={styles.membersList}>
-            {sampleMembers.map((member) => (
+            {members.map((member) => (
               <TouchableOpacity 
                 key={member.id} 
                 style={styles.memberCard}
