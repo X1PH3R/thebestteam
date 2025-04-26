@@ -1,22 +1,23 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
 
 const events = [
   { id: '1', title: 'Tech Fair 2025', date: 'May 10, 2025' },
-  { id: '2', title: 'Club Showcase', date: 'May 15, 2025' },
+  { id: '2', title: 'SJU Club Showcase', date: 'May 15, 2025' },
+  { id: '3', title: 'Hackathon Weekend', date: 'June 1, 2025' },
 ];
 
 export default function EventsScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Events</Text>
+      <Text style={styles.title}>Upcoming Events</Text>
       <FlatList
         data={events}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.eventItem}>
-            <Text style={styles.eventTitle}>{item.title}</Text>
-            <Text style={styles.eventDate}>{item.date}</Text>
+          <View style={styles.item}>
+            <Text style={styles.itemText}>{item.title}</Text>
+            <Text style={styles.itemDate}>{item.date}</Text>
           </View>
         )}
       />
@@ -27,37 +28,28 @@ export default function EventsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f0f4f7',
+    backgroundColor: '#fff',
+    paddingTop: 50,
+    paddingHorizontal: 20,
   },
   title: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#cc0000',
+    textAlign: 'center',
   },
-  eventItem: {
+  item: {
     padding: 15,
-    backgroundColor: 'white',
-    borderRadius: 8,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+    marginVertical: 8,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 10,
   },
-  eventTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
+  itemText: {
+    fontSize: 18,
   },
-  eventDate: {
+  itemDate: {
     fontSize: 14,
-    color: '#666',
+    color: 'gray',
   },
 }); 
