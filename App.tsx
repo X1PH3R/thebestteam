@@ -20,6 +20,8 @@ import ExploreClubsScreen from './src/screens/ClubScreen';
 import EventScreen from './src/screens/EventScreen';
 import ClubDetailsScreen from './src/screens/ClubDetailsScreen';
 import MyClubsScreen from './src/screens/MyClubsScreen';
+import MemberProfileScreen from './src/screens/MemberProfileScreen';
+import CreateProfileScreen from './src/screens/CreateProfileScreen';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -29,11 +31,14 @@ type RootStackParamList = {
   ClubDetails: { club: any };
   Events: undefined;
   ExploreClubs: undefined;
+  MemberProfile: { member: any };
+  CreateProfile: undefined;
 };
 
 type TabParamList = {
   Home: undefined;
   Explore: undefined;
+  Profile: undefined;
 };
 
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -86,6 +91,20 @@ const HomeStack = () => (
         title: 'Events',
       }}
     />
+    <Stack.Screen 
+      name="MemberProfile" 
+      component={MemberProfileScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
+    <Stack.Screen 
+      name="CreateProfile" 
+      component={CreateProfileScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
   </Stack.Navigator>
 );
 
@@ -122,6 +141,20 @@ const ExploreStack = () => (
         title: 'Events',
       }}
     />
+    <Stack.Screen 
+      name="MemberProfile" 
+      component={MemberProfileScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
+    <Stack.Screen 
+      name="CreateProfile" 
+      component={CreateProfileScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
   </Stack.Navigator>
 );
 
@@ -144,6 +177,8 @@ export default function App() {
                   iconName = focused ? 'home' : 'home-outline';
                 } else if (route.name === 'Explore') {
                   iconName = focused ? 'compass' : 'compass-outline';
+                } else if (route.name === 'Profile') {
+                  iconName = focused ? 'person' : 'person-outline';
                 } else {
                   iconName = 'help';
                 }
@@ -191,6 +226,13 @@ export default function App() {
               component={HomeStack}
               options={{
                 title: 'Home',
+              }}
+            />
+            <Tab.Screen 
+              name="Profile" 
+              component={CreateProfileScreen}
+              options={{
+                title: 'Profile',
               }}
             />
           </Tab.Navigator>

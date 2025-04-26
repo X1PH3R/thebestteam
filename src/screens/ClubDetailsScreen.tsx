@@ -11,14 +11,63 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 
 type RootStackParamList = {
   Clubs: undefined;
   Events: undefined;
   ClubDetails: { club: any };
+  MemberProfile: { member: any };
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+// Sample member data - in a real app, this would come from your backend
+const sampleMembers = [
+  { 
+    id: 1, 
+    name: 'John Doe', 
+    role: 'President', 
+    imageUrl: 'https://via.placeholder.com/50',
+    description: 'Passionate about technology and innovation. Leading the club with a vision to make a difference.',
+    email: 'john.doe@example.com',
+    instagram: 'johndoe',
+    linkedin: 'linkedin.com/in/johndoe',
+    twitter: 'johndoe',
+    joinDate: 'January 2023'
+  },
+  { 
+    id: 2, 
+    name: 'Jane Smith', 
+    role: 'Vice President', 
+    imageUrl: 'https://via.placeholder.com/50',
+    description: 'Experienced in event planning and community building. Always looking for new ways to engage members.',
+    email: 'jane.smith@example.com',
+    instagram: 'janesmith',
+    linkedin: 'linkedin.com/in/janesmith',
+    joinDate: 'March 2023'
+  },
+  { 
+    id: 3, 
+    name: 'Mike Johnson', 
+    role: 'Treasurer', 
+    imageUrl: 'https://via.placeholder.com/50',
+    description: 'Finance professional with a keen eye for detail. Ensuring the club\'s resources are well-managed.',
+    email: 'mike.johnson@example.com',
+    linkedin: 'linkedin.com/in/mikejohnson',
+    joinDate: 'April 2023'
+  },
+  { 
+    id: 4, 
+    name: 'Sarah Wilson', 
+    role: 'Member', 
+    imageUrl: 'https://via.placeholder.com/50',
+    description: 'New member excited to contribute to the club\'s growth and learn from others.',
+    email: 'sarah.wilson@example.com',
+    instagram: 'sarahwilson',
+    joinDate: 'September 2023'
+  },
+];
 
 const ClubDetailsScreen = () => {
   const navigation = useNavigation<NavigationProp>();
@@ -62,6 +111,29 @@ const ClubDetailsScreen = () => {
         <View style={styles.descriptionContainer}>
           <Text style={styles.sectionTitle}>About</Text>
           <Text style={styles.description}>{club.description}</Text>
+        </View>
+
+        <View style={styles.membersContainer}>
+          <Text style={styles.sectionTitle}>Club Members</Text>
+          <View style={styles.membersList}>
+            {sampleMembers.map((member) => (
+              <TouchableOpacity 
+                key={member.id} 
+                style={styles.memberCard}
+                onPress={() => navigation.navigate('MemberProfile', { member })}
+              >
+                <Image
+                  source={{ uri: member.imageUrl }}
+                  style={styles.memberImage}
+                />
+                <View style={styles.memberInfo}>
+                  <Text style={styles.memberName}>{member.name}</Text>
+                  <Text style={styles.memberRole}>{member.role}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={24} color="#666" />
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
 
         <View style={styles.meetingTimesContainer}>
@@ -189,6 +261,38 @@ const styles = StyleSheet.create({
     color: '#666',
     lineHeight: 24,
   },
+  membersContainer: {
+    marginBottom: 20,
+  },
+  membersList: {
+    gap: 10,
+  },
+  memberCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f8f8',
+    borderRadius: 10,
+    padding: 15,
+  },
+  memberImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
+  },
+  memberInfo: {
+    flex: 1,
+  },
+  memberName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
+  },
+  memberRole: {
+    fontSize: 14,
+    color: '#666',
+  },
   meetingTimesContainer: {
     marginBottom: 20,
   },
@@ -253,12 +357,17 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   buttonContainer: {
-    gap: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    marginBottom: 40,
   },
   button: {
-    borderRadius: 10,
-    padding: 15,
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
     alignItems: 'center',
+    marginHorizontal: 5,
   },
   joinButton: {
     backgroundColor: '#007AFF',
@@ -268,7 +377,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });
