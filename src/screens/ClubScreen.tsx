@@ -72,7 +72,7 @@ const CLUBS = [
   }
 ];
 
-const ExploreClubsScreen = () => {
+const ExploreScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -134,7 +134,7 @@ const ExploreClubsScreen = () => {
             onPress={() => navigation.navigate('ClubDetails', { club })}
           >
             <Image
-              source={{ uri: club.imageUrl }}
+              source={typeof club.imageUrl === 'string' ? { uri: club.imageUrl } : club.imageUrl}
               style={styles.clubImage}
             />
             <View style={styles.clubInfo}>
@@ -260,4 +260,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ExploreClubsScreen; 
+export default ExploreScreen; 
