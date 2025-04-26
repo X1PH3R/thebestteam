@@ -37,19 +37,26 @@ const MyClubsScreen = () => {
   // Prepare agenda items
   const agendaItems = useMemo(() => {
     const items: Record<string, any[]> = {};
-    joinedClubs.forEach(club => {
-      (club.meetingTimes ?? []).forEach(meeting => {
-        // We'll use the next upcoming date for each meeting (for demo, use today)
-        // In a real app, you'd calculate the next occurrence based on day/frequency
-        const today = new Date();
-        const dayOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].indexOf(meeting.day);
-        let date = new Date(today);
-        date.setDate(today.getDate() + ((dayOfWeek - today.getDay() + 7) % 7));
-        const dateString = date.toISOString().split('T')[0];
-        if (!items[dateString]) items[dateString] = [];
-        items[dateString].push({ club, meeting });
+    const today = new Date();
+    for (let offset = 0; offset < 30; offset++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + offset);
+      const dateString = date.toISOString().split('T')[0];
+      items[dateString] = []; // Always initialize as empty array
+      joinedClubs.forEach(club => {
+        (club.meetingTimes ?? []).forEach(meeting => {
+          const dayOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].indexOf(meeting.day);
+          // For weekly meetings, add if day matches
+          if (meeting.frequency.toLowerCase() === 'weekly' && date.getDay() === dayOfWeek) {
+            items[dateString].push({ club, meeting });
+          }
+          // For monthly meetings, add if day and week match (simple: first occurrence in month)
+          if (meeting.frequency.toLowerCase() === 'monthly' && date.getDay() === dayOfWeek && date.getDate() <= 7) {
+            items[dateString].push({ club, meeting });
+          }
+        });
       });
-    });
+    }
     return items;
   }, [joinedClubs]);
 
