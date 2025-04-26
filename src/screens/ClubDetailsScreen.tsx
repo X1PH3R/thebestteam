@@ -1,26 +1,52 @@
 import React from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  Image,
-  TouchableOpacity,
-  StatusBar,
-  Linking
-} from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Linking } from 'react-native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { useJoinedClubs } from '../context/JoinedClubsContext';
 
 type RootStackParamList = {
-  Clubs: undefined;
-  Events: undefined;
-  ClubDetails: { club: any };
+  Home: undefined;
+  Explore: undefined;
+  ClubDetails: { club: Club };
+  MyClubs: { joinedClub?: Club };
   MemberProfile: { member: any };
 };
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type TabParamList = {
+  Home: undefined;
+  Explore: undefined;
+  Profile: undefined;
+};
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList> & BottomTabNavigationProp<TabParamList>;
+type ClubDetailsRouteProp = RouteProp<RootStackParamList, 'ClubDetails'>;
+
+interface Meeting {
+  day: string;
+  time: string;
+  location: string;
+  frequency: string;
+}
+
+interface Event {
+  title: string;
+  date: string;
+  description: string;
+}
+
+interface Club {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  image: any;
+  memberCount: number;
+  meetingTimes: Meeting[];
+  calendarLink: string;
+  upcomingEvents: Event[];
+}
 
 // Sample member data - in a real app, this would come from your backend
 const sampleMembers = [
@@ -71,47 +97,48 @@ const sampleMembers = [
 
 const ClubDetailsScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const route = useRoute();
-  const { club } = route.params as { club: any };
+  const route = useRoute<ClubDetailsRouteProp>();
+  const { club } = route.params;
+  const { joinClub, joinedClubs } = useJoinedClubs();
+  const isJoined = joinedClubs.some(c => c.id === club.id);
 
-  const handleAddToCalendar = async () => {
-    try {
-      await Linking.openURL(club.calendarLink);
-    } catch (error) {
-      console.error('Error opening calendar link:', error);
+  const handleAddToCalendar = () => {
+    if (club.calendarLink) {
+      Linking.openURL(club.calendarLink);
     }
+  };
+
+  const handleJoinClub = () => {
+    joinClub(club);
+    navigation.navigate('Home');
   };
 
   return (
     <ScrollView style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      <View style={styles.header}>
-        <Image
-          source={{ uri: club.imageUrl }}
-          style={styles.headerImage}
-        />
-        <View style={styles.headerOverlay} />
+      {/* Header Image */}
+      <View style={styles.headerImageContainer}>
+        {club.image && (
+          <Image source={typeof club.image === 'string' ? { uri: club.image } : club.image} style={styles.headerImage} />
+        )}
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backButtonText}>←</Text>
+          <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
       </View>
 
+      {/* Club Info */}
       <View style={styles.content}>
-        <View style={styles.clubInfo}>
-          <Text style={styles.clubName}>{club.name}</Text>
-          <View style={styles.categoryContainer}>
-            <Text style={styles.category}>{club.category}</Text>
-            <Text style={styles.memberCount}>{club.members} members</Text>
-          </View>
+        <Text style={styles.clubName}>{club.name}</Text>
+        <Text style={styles.clubCategory}>{club.category}</Text>
+        
+        <View style={styles.memberCountContainer}>
+          <Ionicons name="people-outline" size={16} color="#666" />
+          <Text style={styles.memberCount}>{club.memberCount} members</Text>
         </View>
 
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.sectionTitle}>About</Text>
-          <Text style={styles.description}>{club.description}</Text>
-        </View>
+        <Text style={styles.description}>{club.description}</Text>
 
         <View style={styles.membersContainer}>
           <Text style={styles.sectionTitle}>Club Members</Text>
@@ -136,47 +163,48 @@ const ClubDetailsScreen = () => {
           </View>
         </View>
 
-        <View style={styles.meetingTimesContainer}>
+        {/* Meeting Times */}
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Meeting Times</Text>
-          {club.meetingTimes.map((meeting: any, index: number) => (
-            <View key={index} style={styles.meetingCard}>
-              <View style={styles.meetingHeader}>
-                <Text style={styles.meetingDay}>{meeting.day}</Text>
-                <Text style={styles.meetingFrequency}>{meeting.frequency}</Text>
-              </View>
-              <View style={styles.meetingDetails}>
-                <Text style={styles.meetingTime}>⏰ {meeting.time}</Text>
-                <Text style={styles.meetingLocation}>📍 {meeting.location}</Text>
-              </View>
+          {club.meetingTimes?.map((meeting: Meeting, index: number) => (
+            <View key={index} style={styles.meetingTime}>
+              <Text style={styles.meetingDay}>{meeting.day}</Text>
+              <Text style={styles.meetingDetails}>
+                {meeting.time} • {meeting.location}
+              </Text>
+              <Text style={styles.meetingFrequency}>{meeting.frequency}</Text>
             </View>
           ))}
         </View>
 
-        <View style={styles.eventsContainer}>
+        {/* Upcoming Events */}
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Upcoming Events</Text>
-          <TouchableOpacity 
-            style={styles.eventCard}
-            onPress={() => navigation.navigate('Events')}
-          >
-            <Text style={styles.eventTitle}>Weekly Meeting</Text>
-            <Text style={styles.eventDate}>Every Wednesday at 6:00 PM</Text>
-            <Text style={styles.eventDescription}>Join us for our regular club meeting</Text>
-          </TouchableOpacity>
+          {club.upcomingEvents?.map((event: Event, index: number) => (
+            <View key={index} style={styles.eventCard}>
+              <Text style={styles.eventTitle}>{event.title}</Text>
+              <Text style={styles.eventDate}>{event.date}</Text>
+              <Text style={styles.eventDescription}>{event.description}</Text>
+            </View>
+          ))}
         </View>
 
+        {/* Action Buttons */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
-            style={[styles.button, styles.joinButton]}
-            onPress={() => navigation.navigate('Events')}
-          >
-            <Text style={styles.buttonText}>Join Club</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.button, styles.calendarButton]}
+            style={styles.calendarButton}
             onPress={handleAddToCalendar}
           >
-            <Text style={styles.buttonText}>Add to Calendar</Text>
+            <Ionicons name="calendar-outline" size={20} color="#007AFF" />
+            <Text style={styles.calendarButtonText}>Add to Calendar</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.joinButton, isJoined && { backgroundColor: '#e6f2ff' }]}
+            onPress={handleJoinClub}
+            disabled={isJoined}
+          >
+            <Text style={[styles.joinButtonText, isJoined && { color: '#007AFF' }]}>{isJoined ? 'Joined' : 'Join Club'}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -189,7 +217,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  header: {
+  headerImageContainer: {
     height: 250,
     position: 'relative',
   },
@@ -197,10 +225,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
-  },
-  headerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.3)',
   },
   backButton: {
     position: 'absolute',
@@ -213,16 +237,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backButtonText: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
   content: {
     padding: 20,
-  },
-  clubInfo: {
-    marginBottom: 20,
   },
   clubName: {
     fontSize: 28,
@@ -230,24 +246,30 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 8,
   },
-  categoryContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  category: {
+  clubCategory: {
     fontSize: 14,
     color: '#666',
     backgroundColor: '#f0f0f0',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
-    marginRight: 10,
+    marginBottom: 16,
+  },
+  memberCountContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
   },
   memberCount: {
-    fontSize: 14,
+    marginLeft: 8,
     color: '#666',
   },
-  descriptionContainer: {
+  description: {
+    fontSize: 16,
+    color: '#666',
+    lineHeight: 24,
+  },
+  section: {
     marginBottom: 20,
   },
   sectionTitle: {
@@ -256,10 +278,80 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 10,
   },
-  description: {
-    fontSize: 16,
+  meetingTime: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  meetingDay: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  meetingDetails: {
+    fontSize: 14,
     color: '#666',
-    lineHeight: 24,
+  },
+  meetingFrequency: {
+    fontSize: 14,
+    color: '#666',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  eventCard: {
+    backgroundColor: '#f8f8f8',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+  },
+  eventTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 5,
+  },
+  eventDate: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
+  },
+  eventDescription: {
+    fontSize: 14,
+    color: '#666',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    marginBottom: 40,
+  },
+  calendarButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f0f7ff',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 12,
+  },
+  calendarButtonText: {
+    color: '#007AFF',
+    marginLeft: 8,
+    fontWeight: '600',
+  },
+  joinButton: {
+    borderRadius: 10,
+    padding: 15,
+    alignItems: 'center',
+    backgroundColor: '#007AFF',
+  },
+  joinButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   membersContainer: {
     marginBottom: 20,
@@ -292,93 +384,6 @@ const styles = StyleSheet.create({
   memberRole: {
     fontSize: 14,
     color: '#666',
-  },
-  meetingTimesContainer: {
-    marginBottom: 20,
-  },
-  meetingCard: {
-    backgroundColor: '#f8f8f8',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-  },
-  meetingHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  meetingDay: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  meetingFrequency: {
-    fontSize: 14,
-    color: '#666',
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  meetingDetails: {
-    gap: 4,
-  },
-  meetingTime: {
-    fontSize: 14,
-    color: '#666',
-  },
-  meetingLocation: {
-    fontSize: 14,
-    color: '#666',
-  },
-  eventsContainer: {
-    marginBottom: 20,
-  },
-  eventCard: {
-    backgroundColor: '#f8f8f8',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-  },
-  eventTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
-  },
-  eventDate: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 5,
-  },
-  eventDescription: {
-    fontSize: 14,
-    color: '#666',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-    marginBottom: 40,
-  },
-  button: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginHorizontal: 5,
-  },
-  joinButton: {
-    backgroundColor: '#007AFF',
-  },
-  calendarButton: {
-    backgroundColor: '#34C759',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 

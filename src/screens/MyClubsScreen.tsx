@@ -1,113 +1,123 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity,
-  FlatList
-} from 'react-native';
-import { Calendar } from 'react-native-calendars';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Linking } from 'react-native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { useJoinedClubs } from '../context/JoinedClubsContext';
 
 type RootStackParamList = {
-  Clubs: undefined;
-  Events: undefined;
+  MyClubs: { joinedClub?: any };
+  Explore: undefined;
   ClubDetails: { club: any };
-  MyClubs: undefined;
 };
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type TabParamList = {
+  Home: undefined;
+  Explore: undefined;
+};
 
-// Sample data for joined clubs
-const JOINED_CLUBS = [
-  {
-    id: '1',
-    name: 'Photography Club',
-    imageUrl: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Y2hpYHx8&auto=format&fit=crop&w=1638&q=80',
-    meetingTimes: [
-      { day: 'Monday', time: '3:00 PM', location: 'Room 101' },
-      { day: 'Thursday', time: '3:00 PM', location: 'Room 101' }
-    ]
-  },
-  {
-    id: '2',
-    name: 'Chess Club',
-    imageUrl: 'https://images.unsplash.com/photo-1529307473937-262d4b6c0c0e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Y2hpYHx8&auto=format&fit=crop&w=1638&q=80',
-    meetingTimes: [
-      { day: 'Wednesday', time: '4:00 PM', location: 'Room 203' }
-    ]
-  }
-];
+type NavigationProp = NativeStackNavigationProp<RootStackParamList> & BottomTabNavigationProp<TabParamList>;
+type MyClubsRouteProp = RouteProp<RootStackParamList, 'MyClubs'>;
+
+interface Club {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  image: any;
+  memberCount: number;
+  meetingTimes: Array<{
+    day: string;
+    time: string;
+    location: string;
+    frequency: string;
+  }>;
+  calendarLink: string;
+  upcomingEvents: Array<{
+    title: string;
+    date: string;
+    description: string;
+  }>;
+}
 
 const MyClubsScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const route = useRoute<MyClubsRouteProp>();
+  const { joinedClubs } = useJoinedClubs();
 
-  // Generate marked dates for the calendar
-  const getMarkedDates = () => {
-    const marked: any = {};
-    JOINED_CLUBS.forEach(club => {
-      club.meetingTimes.forEach(meeting => {
-        // This is a simplified version - in a real app, you'd need to handle recurring events
-        const date = new Date();
-        const dayOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(meeting.day);
-        date.setDate(date.getDate() + (dayOfWeek - date.getDay() + 7) % 7);
-        const dateString = date.toISOString().split('T')[0];
-        marked[dateString] = { marked: true, dotColor: '#007AFF' };
-      });
-    });
-    return marked;
+  // Handle new club from navigation params
+  React.useEffect(() => {
+    if (route.params?.joinedClub) {
+      // This is a placeholder implementation. In a real application, you might want to add the new club to the context
+    }
+  }, [route.params?.joinedClub]);
+
+  const handleExplorePress = () => {
+    // Navigate to the Explore tab
+    navigation.navigate('Explore');
   };
 
-  const renderClubItem = ({ item }: { item: any }) => (
-    <TouchableOpacity 
-      style={styles.clubCard}
-      onPress={() => navigation.navigate('ClubDetails', { club: item })}
-    >
-      <View style={styles.clubInfo}>
-        <Text style={styles.clubName}>{item.name}</Text>
-        <View style={styles.meetingTimes}>
-          {item.meetingTimes.map((meeting: any, index: number) => (
-            <View key={index} style={styles.meetingTime}>
-              <Text style={styles.meetingDay}>{meeting.day}</Text>
-              <Text style={styles.meetingDetails}>{meeting.time} at {meeting.location}</Text>
-            </View>
-          ))}
-        </View>
+  if (joinedClubs.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Ionicons name="people-outline" size={80} color="#007AFF" />
+        <Text style={styles.emptyTitle}>No Clubs Yet</Text>
+        <Text style={styles.emptyText}>Join clubs to see them here</Text>
+        <TouchableOpacity 
+          style={styles.exploreButton}
+          onPress={handleExplorePress}
+        >
+          <Text style={styles.exploreButtonText}>Explore Clubs</Text>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
-  );
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.calendarContainer}>
-        <Calendar
-          onDayPress={day => setSelectedDate(day.dateString)}
-          markedDates={{
-            ...getMarkedDates(),
-            [selectedDate]: { selected: true, marked: true, dotColor: '#007AFF' }
-          }}
-          theme={{
-            selectedDayBackgroundColor: '#007AFF',
-            todayTextColor: '#007AFF',
-            dotColor: '#007AFF',
-            arrowColor: '#007AFF',
-          }}
-        />
+    <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>My Clubs</Text>
       </View>
-      
-      <View style={styles.clubsContainer}>
-        <Text style={styles.sectionTitle}>My Clubs</Text>
-        <FlatList
-          data={JOINED_CLUBS}
-          renderItem={renderClubItem}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.clubsList}
-        />
+      <View style={styles.clubList}>
+        {joinedClubs.map((club, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.clubCard}
+            onPress={() => navigation.navigate('ClubDetails', { club })}
+          >
+            <Image source={typeof club.image === 'string' ? { uri: club.image } : club.image} style={styles.clubImage} />
+            <View style={styles.clubInfo}>
+              <Text style={styles.clubName}>{club.name}</Text>
+              <Text style={styles.clubCategory}>{club.category}</Text>
+              <Text style={styles.clubDescription} numberOfLines={2}>
+                {club.description}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        ))}
       </View>
-    </View>
+      {joinedClubs.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Upcoming Meetings</Text>
+          {joinedClubs.map((club) => (
+            (club.meetingTimes ?? []).map((meeting, idx) => (
+              <View key={club.id + '-meeting-' + idx} style={styles.eventCard}>
+                <Text style={styles.eventTitle}>{club.name}</Text>
+                <Text style={styles.eventDate}>{meeting.day} • {meeting.time}</Text>
+                <Text style={styles.eventDescription}>{meeting.location} ({meeting.frequency})</Text>
+                {club.calendarLink && (
+                  <TouchableOpacity onPress={() => Linking.openURL(club.calendarLink)} style={styles.googleCalendarButton}>
+                    <Ionicons name="logo-google" size={16} color="#fff" />
+                    <Text style={styles.googleCalendarButtonText}>Add to Google Calendar</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            ))
+          ))}
+        </View>
+      )}
+    </ScrollView>
   );
 };
 
@@ -116,56 +126,148 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  calendarContainer: {
-    padding: 10,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  clubsContainer: {
-    flex: 1,
+  header: {
     padding: 20,
+    backgroundColor: '#007AFF',
   },
-  sectionTitle: {
+  title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#333',
+    color: '#fff',
   },
-  clubsList: {
-    paddingBottom: 20,
+  clubList: {
+    padding: 20,
   },
   clubCard: {
-    backgroundColor: '#f8f8f8',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  clubImage: {
+    width: '100%',
+    height: 150,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
   },
   clubInfo: {
-    flex: 1,
+    padding: 16,
   },
   clubName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
+    marginBottom: 4,
   },
-  meetingTimes: {
-    gap: 8,
-  },
-  meetingTime: {
-    backgroundColor: '#fff',
-    padding: 8,
-    borderRadius: 6,
-  },
-  meetingDay: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  meetingDetails: {
+  clubCategory: {
     fontSize: 14,
     color: '#666',
+    marginBottom: 8,
+  },
+  clubDescription: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  exploreButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    borderRadius: 25,
+  },
+  exploreButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  section: {
+    padding: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  eventCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  eventTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  eventDate: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  eventDescription: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+  },
+  calendarButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
+    marginTop: 8,
+  },
+  calendarButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  googleCalendarButton: {
+    backgroundColor: '#34A853',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 5,
+    marginTop: 8,
+  },
+  googleCalendarButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 6,
   },
 });
 
