@@ -29,6 +29,7 @@ import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import GroupChatScreen from './src/screens/GroupChatScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import AllMembersScreen from './src/screens/AllMembersScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -202,6 +203,43 @@ const AuthStack = () => (
   </Stack.Navigator>
 );
 
+const ProfileStack = () => (
+  <Stack.Navigator
+    screenOptions={{
+      headerStyle: {
+        backgroundColor: '#FF3B30',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+    }}
+  >
+    <Stack.Screen 
+      name="Profile" 
+      component={ProfileScreen}
+      options={{
+        headerShown: false
+      }}
+    />
+    <Stack.Screen 
+      name="CreateProfile" 
+      component={CreateProfileScreen}
+      options={{
+        title: 'Edit Profile',
+        headerShown: true,
+      }}
+    />
+    <Stack.Screen 
+      name="ClubDetails" 
+      component={ClubDetailsScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
+  </Stack.Navigator>
+);
+
 const MainApp = () => {
   const { user, isLoading } = useAuth();
 
@@ -299,17 +337,9 @@ const MainApp = () => {
       />
       <Tab.Screen 
         name="Profile" 
-        component={CreateProfileScreen}
+        component={ProfileStack}
         options={{
-          title: 'Profile',
-          headerStyle: {
-            backgroundColor: '#FF3B30',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-          headerShown: true
+          headerShown: false
         }}
       />
     </Tab.Navigator>

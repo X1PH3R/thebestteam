@@ -2,16 +2,16 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
   Home: undefined;
-  Login: undefined;
-  Register: undefined;
-  ForgotPassword: undefined;
-  CreateProfile: undefined;
-  MyClubs: undefined;
-  ExploreClubs: undefined;
+  Clubs: undefined;
+  Calendar: undefined;
+  Profile: undefined;
   ClubDetails: { club: Club };
-  GroupChat: { clubId: string; clubName: string };
-  EventAttendance: { event: Event };
+  GroupChat: { club: Club };
   MemberProfile: { member: User };
+  AllMembers: { club: Club };
+  CreateProfile: undefined;
+  Login: undefined;
+  ForgotPassword: undefined;
 };
 
 export type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -19,32 +19,26 @@ export type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 export interface User {
   id: string;
   email: string;
-  displayName: string;
-  uid: string;
+  displayName?: string;
   photoURL?: string;
-  major?: string;
+  description?: string;
   year?: string;
-  studentId?: string;
+  major?: string;
+  instagram?: string;
+  linkedin?: string;
+  twitter?: string;
 }
 
 export interface Club {
   id: string;
   name: string;
   description: string;
-  image: string;
-  members: User[];
+  photoURL?: string;
+  members: string[];
+  admins: string[];
   events: Event[];
-  location: {
-    name: string;
-    latitude: number;
-    longitude: number;
-  };
-  calendarLink?: string;
-  meetings?: {
-    day: string;  // e.g., "Monday", "Tuesday", etc.
-    time: string; // e.g., "14:00"
-    frequency: string; // e.g., "weekly", "biweekly"
-  }[];
+  announcements: Announcement[];
+  groupChatId?: string;
 }
 
 export interface Event {
@@ -58,7 +52,12 @@ export interface Event {
     longitude: number;
   };
   attendees: User[];
-  clubName?: string;
+}
+
+export interface Meeting {
+  day: string;
+  time: string;
+  frequency: string;
 }
 
 export interface Message {
@@ -70,4 +69,13 @@ export interface Message {
 
 export interface EventAttendanceRouteParams {
   event: Event;
+}
+
+export interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  createdBy: string;
+  clubId: string;
 } 
