@@ -44,7 +44,7 @@ const LoginScreen = ({ navigation }: any) => {
           <View style={styles.iconContainer}>
             <Ionicons name="people-circle" size={100} color="#007AFF" />
           </View>
-          <Text style={styles.title}>The Best Team</Text>
+          <Text style={styles.title}>ClubConect</Text>
           <Text style={styles.subtitle}>University Student Login</Text>
         </View>
 
