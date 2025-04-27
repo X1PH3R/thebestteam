@@ -42,7 +42,7 @@ const LoginScreen = ({ navigation }: any) => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.logoContainer}>
           <View style={styles.iconContainer}>
-            <Ionicons name="people-circle" size={100} color="#007AFF" />
+            <Ionicons name="people-circle" size={100} color="#FF3B30" />
           </View>
           <Text style={styles.title}>ClubConect</Text>
           <Text style={styles.subtitle}>University Student Login</Text>
@@ -145,12 +145,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#FF3B30',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#000',
   },
   formContainer: {
     width: '100%',
@@ -172,6 +172,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 16,
+    color: '#000',
   },
   eyeIcon: {
     padding: 10,
@@ -181,11 +182,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   forgotPasswordText: {
-    color: '#007AFF',
+    color: '#FF3B30',
     fontSize: 14,
   },
   loginButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#FF3B30',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -195,21 +196,21 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   loginButtonText: {
-    color: '#fff',
+    color: '#000',
     fontSize: 18,
     fontWeight: 'bold',
   },
   registerContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 20,
+    alignItems: 'center',
   },
   registerText: {
-    color: '#666',
+    color: '#000',
     fontSize: 14,
   },
   registerLink: {
-    color: '#007AFF',
+    color: '#FF3B30',
     fontSize: 14,
     fontWeight: 'bold',
   },

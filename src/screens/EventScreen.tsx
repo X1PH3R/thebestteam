@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Calendar } from 'react-native-calendars';
 import { useJoinedClubs } from '../context/JoinedClubsContext';
-import { Club, Event } from '../types';
+import { Club, Event, User } from '../types';
 
 type RootStackParamList = {
   Home: undefined;
@@ -12,6 +12,10 @@ type RootStackParamList = {
   Events: undefined;
   ClubDetails: { club: Club };
   ExploreClubs: undefined;
+  MemberProfile: { member: User };
+  MyClubs: undefined;
+  GroupChat: { clubId: string; clubName: string };
+  EventAttendance: { event: Event };
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -69,7 +73,7 @@ const EventScreen = () => {
             marked: true,
             dots: [{
               key: 'event',
-              color: '#007AFF'
+              color: '#FF3B30'
             }],
             selected: eventDate === selectedDate
           };
@@ -90,14 +94,14 @@ const EventScreen = () => {
                 marked: true,
                 dots: [{
                   key: 'meeting',
-                  color: '#28CD41'
+                  color: '#34C759',
                 }],
                 selected: meetingDate === selectedDate
               };
             } else if (markedDates[meetingDate].dots) {
               markedDates[meetingDate].dots?.push({
                 key: 'meeting',
-                color: '#28CD41'
+                color: '#34C759'
               });
             }
           });
@@ -154,6 +158,16 @@ const EventScreen = () => {
     setEventsForSelectedDate(getEventsForDate(dateString));
   };
 
+  // Add handleEventClick function
+  const handleEventClick = (event: CalendarEvent) => {
+    const club = joinedClubs.find(c => c.name === event.clubName);
+    if (club) {
+      navigation.navigate('ClubDetails', { club });
+    } else {
+      console.warn('Club not found for event:', event);
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -163,11 +177,11 @@ const EventScreen = () => {
       
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#007AFF' }]} />
+          <View style={[styles.legendDot, { backgroundColor: '#FF3B30' }]} />
           <Text style={styles.legendText}>Special Events</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#28CD41' }]} />
+          <View style={[styles.legendDot, { backgroundColor: '#34C759' }]} />
           <Text style={styles.legendText}>Regular Meetings</Text>
         </View>
       </View>
@@ -177,16 +191,16 @@ const EventScreen = () => {
         theme={{
           calendarBackground: '#ffffff',
           textSectionTitleColor: '#b6c1cd',
-          selectedDayBackgroundColor: '#007AFF',
+          selectedDayBackgroundColor: '#FF3B30',
           selectedDayTextColor: '#ffffff',
-          todayTextColor: '#007AFF',
+          todayTextColor: '#FF3B30',
           dayTextColor: '#2d4150',
           textDisabledColor: '#d9e1e8',
-          dotColor: '#007AFF',
+          dotColor: '#FF3B30',
           selectedDotColor: '#ffffff',
-          arrowColor: '#007AFF',
+          arrowColor: '#FF3B30',
           monthTextColor: '#2d4150',
-          indicatorColor: '#007AFF',
+          indicatorColor: '#FF3B30',
         }}
         markingType="multi-dot"
         markedDates={getMarkedDates()}
@@ -210,20 +224,13 @@ const EventScreen = () => {
               <View style={styles.summaryTile}>
                 <Text style={styles.summaryTitle}>Club Meetings Today</Text>
                 {[...new Set(eventsForSelectedDate.map(event => event.clubName))].map((clubName, index) => (
-                  <TouchableOpacity
+                  <View
                     key={index}
                     style={styles.clubMeetingRow}
-                    onPress={() => {
-                      const club = joinedClubs.find(c => c.name === clubName);
-                      if (club) {
-                        navigation.navigate('ExploreClubs');
-                      }
-                    }}
-                    activeOpacity={0.7}
                   >
                     <View style={styles.clubIndicator} />
                     <Text style={styles.clubMeetingText}>
-                      {clubName}
+                      {clubName ?? 'Unnamed Club'}
                     </Text>
                     <Text style={styles.meetingTime}>
                       {eventsForSelectedDate
@@ -232,26 +239,20 @@ const EventScreen = () => {
                             .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                         : ''}
                     </Text>
-                  </TouchableOpacity>
+                  </View>
                 ))}
               </View>
 
               {eventsForSelectedDate.map((event, index) => (
-                <TouchableOpacity 
+                <View 
                   key={index}
                   style={[
                     styles.eventCard,
                     event.isMeeting && styles.meetingCard
                   ]}
-                  onPress={() => {
-                    const club = joinedClubs.find(c => c.name === event.clubName);
-                    if (club) {
-                      navigation.navigate('ClubDetails', { club });
-                    }
-                  }}
                 >
-                  <Text style={styles.eventName}>{event.title}</Text>
-                  <Text style={styles.clubName}>{event.clubName}</Text>
+                  <Text style={styles.eventName}>{event.title ?? 'Untitled Event'}</Text>
+                  <Text style={styles.clubName}>{event.clubName ?? 'Unnamed Club'}</Text>
                   <Text style={styles.eventTime}>
                     {new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </Text>
@@ -261,7 +262,7 @@ const EventScreen = () => {
                       <Text style={styles.meetingBadgeText}>Regular Meeting</Text>
                     </View>
                   )}
-                </TouchableOpacity>
+                </View>
               ))}
             </>
           ) : (
@@ -280,7 +281,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#FF3B30',
   },
   headerText: {
     fontSize: 24,
@@ -355,7 +356,7 @@ const styles = StyleSheet.create({
   },
   meetingCard: {
     borderLeftWidth: 4,
-    borderLeftColor: '#28CD41',
+    borderLeftColor: '#34C759',
   },
   eventName: {
     fontSize: 18,
@@ -365,7 +366,7 @@ const styles = StyleSheet.create({
   },
   clubName: {
     fontSize: 16,
-    color: '#007AFF',
+    color: '#FF3B30',
     marginBottom: 5,
   },
   eventTime: {

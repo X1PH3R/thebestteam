@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#FF3B30',
   },
   title: {
     fontSize: 28,
@@ -248,17 +248,19 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: 'rgba(255, 255, 255, 0.9)',
   },
   searchContainer: {
     padding: 20,
     backgroundColor: '#fff',
   },
   searchInput: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#f8f8f8',
     borderRadius: 10,
     padding: 15,
     fontSize: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 59, 48, 0.2)', // Light red border
   },
   categoriesContainer: {
     paddingHorizontal: 20,
@@ -268,18 +270,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#f8f8f8',
     marginRight: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 59, 48, 0.2)', // Light red border
   },
   categoryButtonActive: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#FF3B30',
+    borderColor: '#FF3B30',
   },
   categoryButtonText: {
-    color: '#666',
+    color: '#FF3B30',
     fontSize: 14,
+    fontWeight: '500',
   },
   categoryButtonTextActive: {
     color: '#fff',
+    fontWeight: '600',
   },
   clubList: {
     padding: 20,
@@ -288,14 +295,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 15,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: '#FF3B30',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 59, 48, 0.1)', // Very light red border
   },
   clubImage: {
     width: '100%',
@@ -307,10 +316,10 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   clubName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#FF3B30',
+    marginBottom: 5,
   },
   clubMeta: {
     flexDirection: 'row',
@@ -319,20 +328,22 @@ const styles = StyleSheet.create({
   },
   clubCategory: {
     fontSize: 14,
-    color: '#666',
-    backgroundColor: '#f0f0f0',
+    color: '#FF3B30',
+    backgroundColor: 'rgba(255, 59, 48, 0.1)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
     marginRight: 10,
+    fontWeight: '500',
   },
   clubMembers: {
     fontSize: 14,
-    color: '#666',
+    color: '#FF3B30',
+    fontWeight: '500',
   },
   clubDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#333',
     lineHeight: 20,
   },
 });

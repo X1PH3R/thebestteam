@@ -76,7 +76,7 @@ const HomeStack = () => (
   <Stack.Navigator
     screenOptions={{
       headerStyle: {
-        backgroundColor: '#007AFF',
+        backgroundColor: '#FF3B30',
       },
       headerTintColor: '#fff',
       headerTitleStyle: {
@@ -126,7 +126,7 @@ const ExploreStack = () => (
   <Stack.Navigator
     screenOptions={{
       headerStyle: {
-        backgroundColor: '#007AFF',
+        backgroundColor: '#FF3B30',
       },
       headerTintColor: '#fff',
       headerTitleStyle: {
@@ -190,7 +190,7 @@ const MainApp = () => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color="#FF3B30" />
       </View>
     );
   }
@@ -217,9 +217,15 @@ const MainApp = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#007AFF',
+        tabBarActiveTintColor: '#FF3B30',
         tabBarInactiveTintColor: 'gray',
-        headerShown: false,
+        headerStyle: {
+          backgroundColor: '#FF3B30',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
         tabBarStyle: {
           paddingBottom: 10,
           paddingTop: 10,
@@ -264,7 +270,7 @@ const MainApp = () => {
         options={{
           title: 'Calendar',
           headerStyle: {
-            backgroundColor: '#007AFF',
+            backgroundColor: '#FF3B30',
           },
           headerTintColor: '#fff',
           headerTitleStyle: {
@@ -279,7 +285,7 @@ const MainApp = () => {
         options={{
           title: 'Profile',
           headerStyle: {
-            backgroundColor: '#007AFF',
+            backgroundColor: '#FF3B30',
           },
           headerTintColor: '#fff',
           headerTitleStyle: {
@@ -323,4 +329,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
   },
+  activityIndicator: {
+    color: '#FF3B30'
+  }
 });
