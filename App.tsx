@@ -28,6 +28,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import GroupChatScreen from './src/screens/GroupChatScreen';
 import HomeScreen from './src/screens/HomeScreen';
+import AllMembersScreen from './src/screens/AllMembersScreen';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -43,7 +44,8 @@ type RootStackParamList = {
   ExploreClubs: undefined;
   MemberProfile: { member: any };
   CreateProfile: undefined;
-  GroupChat: undefined;
+  GroupChat: { clubId: string; clubName: string };
+  AllMembers: { members: any[]; clubName: string };
 };
 
 type TabParamList = {
@@ -119,6 +121,14 @@ const HomeStack = () => (
         headerShown: false,
       }}
     />
+    <Stack.Screen 
+      name="AllMembers" 
+      component={AllMembersScreen}
+      options={{
+        title: 'Members',
+        headerShown: true,
+      }}
+    />
   </Stack.Navigator>
 );
 
@@ -167,6 +177,14 @@ const ExploreStack = () => (
       component={CreateProfileScreen}
       options={{
         headerShown: false,
+      }}
+    />
+    <Stack.Screen 
+      name="AllMembers" 
+      component={AllMembersScreen}
+      options={{
+        title: 'Members',
+        headerShown: true,
       }}
     />
   </Stack.Navigator>

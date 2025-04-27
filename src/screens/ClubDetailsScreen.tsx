@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Linking, Alert } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -13,6 +13,7 @@ type RootStackParamList = {
   ClubDetails: { club: Club };
   MyClubs: { joinedClub?: Club };
   MemberProfile: { member: User };
+  AllMembers: { members: User[]; clubName: string };
 };
 
 type TabParamList = {
@@ -81,7 +82,7 @@ const ClubDetailsScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<ClubDetailsRouteProp>();
   const { club } = route.params;
-  const { joinClub, joinedClubs } = useJoinedClubs();
+  const { joinClub, leaveClub, joinedClubs } = useJoinedClubs();
   const isJoined = joinedClubs.some(c => c.id === club.id);
   const [imageError, setImageError] = useState(false);
   const members = club.members && Array.isArray(club.members) && club.members.length > 0 ? club.members : sampleMembers;
@@ -95,6 +96,35 @@ const ClubDetailsScreen = () => {
   const handleJoinClub = () => {
     joinClub(club);
     navigation.navigate('Home');
+  };
+
+  const handleLeaveClub = () => {
+    Alert.alert(
+      'Leave Club',
+      'Are you sure you want to leave this club?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Leave',
+          style: 'destructive',
+          onPress: () => {
+            leaveClub(club.id);
+            navigation.navigate('Home');
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const handleViewAllMembers = () => {
+    navigation.navigate('AllMembers', {
+      members: members,
+      clubName: club.name
+    });
   };
 
   return (
@@ -133,9 +163,18 @@ const ClubDetailsScreen = () => {
         <Text style={styles.description}>{club.description}</Text>
 
         <View style={styles.membersContainer}>
-          <Text style={styles.sectionTitle}>Club Members</Text>
+          <View style={styles.memberHeader}>
+            <Text style={styles.sectionTitle}>Club Members</Text>
+            <TouchableOpacity 
+              style={styles.viewAllButton}
+              onPress={handleViewAllMembers}
+            >
+              <Text style={styles.viewAllText}>View All</Text>
+              <Ionicons name="chevron-forward" size={16} color="#007AFF" />
+            </TouchableOpacity>
+          </View>
           <View style={styles.membersList}>
-            {members.map((member) => (
+            {members.slice(0, 3).map((member) => (
               <TouchableOpacity 
                 key={member.id} 
                 style={styles.memberCard}
@@ -155,8 +194,15 @@ const ClubDetailsScreen = () => {
           </View>
         </View>
 
-        {/* Join Button */}
-        {!isJoined && (
+        {/* Join/Leave Button */}
+        {isJoined ? (
+          <TouchableOpacity 
+            style={styles.leaveButton}
+            onPress={handleLeaveClub}
+          >
+            <Text style={styles.leaveButtonText}>Leave Club</Text>
+          </TouchableOpacity>
+        ) : (
           <TouchableOpacity 
             style={styles.joinButton}
             onPress={handleJoinClub}
@@ -295,6 +341,34 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
+  },
+  memberHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  viewAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  viewAllText: {
+    color: '#007AFF',
+    fontSize: 14,
+    fontWeight: '600',
+    marginRight: 4,
+  },
+  leaveButton: {
+    backgroundColor: '#FF3B30',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  leaveButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

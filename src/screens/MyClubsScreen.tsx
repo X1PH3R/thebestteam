@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useJoinedClubs } from '../context/JoinedClubsContext';
@@ -8,7 +8,7 @@ import type { Club } from '../types';
 
 type RootStackParamList = {
   Home: undefined;
-  GroupChat: undefined;
+  GroupChat: { clubId: string; clubName: string };
   ClubDetails: { club: Club };
 };
 
@@ -22,14 +22,25 @@ const MyClubsScreen = () => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity
-          onPress={() => navigation.navigate('GroupChat')}
+          onPress={() => {
+            // Navigate to GroupChat with the first joined club if available
+            if (joinedClubs && joinedClubs.length > 0) {
+              navigation.navigate('GroupChat', {
+                clubId: joinedClubs[0].id,
+                clubName: joinedClubs[0].name
+              });
+            } else {
+              // Handle case when no clubs are joined
+              Alert.alert('No Clubs', 'Please join a club first to access the group chat.');
+            }
+          }}
           style={styles.chatButton}
         >
           <Ionicons name="chatbubbles-outline" size={24} color="#fff" />
         </TouchableOpacity>
       ),
     });
-  }, [navigation]);
+  }, [navigation, joinedClubs]);
 
   const renderClubCard = ({ item }: { item: Club }) => (
     <TouchableOpacity

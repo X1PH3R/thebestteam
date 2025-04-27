@@ -12,10 +12,12 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
+import { useJoinedClubs } from '../context/JoinedClubsContext';
+import type { Club } from '../types';
 
 type RootStackParamList = {
   MyClubs: undefined;
-  ClubDetails: { club: any };
+  ClubDetails: { club: Club };
   Events: undefined;
   ExploreClubs: undefined;
   MemberProfile: { member: any };
@@ -28,6 +30,12 @@ const MemberProfileScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
   const { member } = route.params as { member: any };
+  const { joinedClubs } = useJoinedClubs();
+
+  // Filter clubs where this member is a participant
+  const memberClubs = joinedClubs.filter(club => 
+    club.members.some(m => m.id === member.id)
+  );
 
   const handleSocialLink = async (url: string) => {
     try {
@@ -42,7 +50,7 @@ const MemberProfileScreen = () => {
       <StatusBar barStyle="light-content" />
       <View style={styles.header}>
         <Image
-          source={{ uri: member.imageUrl }}
+          source={{ uri: member.imageUrl || member.photoURL }}
           style={styles.headerImage}
         />
         <View style={styles.headerOverlay} />
@@ -62,8 +70,38 @@ const MemberProfileScreen = () => {
 
       <View style={styles.content}>
         <View style={styles.profileInfo}>
-          <Text style={styles.memberName}>{member.name}</Text>
-          <Text style={styles.memberRole}>{member.role}</Text>
+          <Text style={styles.memberName}>{member.displayName}</Text>
+          <Text style={styles.memberRole}>{member.major} • Class of {member.year}</Text>
+        </View>
+
+        {/* Clubs Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Clubs</Text>
+          {memberClubs.length > 0 ? (
+            <View style={styles.clubsList}>
+              {memberClubs.map((club) => (
+                <TouchableOpacity
+                  key={club.id}
+                  style={styles.clubCard}
+                  onPress={() => navigation.navigate('ClubDetails', { club })}
+                >
+                  <Image
+                    source={{ uri: club.image }}
+                    style={styles.clubImage}
+                  />
+                  <View style={styles.clubInfo}>
+                    <Text style={styles.clubName}>{club.name}</Text>
+                    <Text style={styles.clubDescription} numberOfLines={2}>
+                      {club.description}
+                    </Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={24} color="#666" />
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.noClubsText}>Not a member of any clubs yet.</Text>
+          )}
         </View>
 
         <View style={styles.section}>
@@ -198,12 +236,47 @@ const styles = StyleSheet.create({
   },
   socialText: {
     fontSize: 16,
-    color: '#333',
+    color: '#666',
     marginLeft: 10,
   },
   joinDate: {
     fontSize: 16,
     color: '#666',
+  },
+  clubsList: {
+    gap: 12,
+  },
+  clubCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f8f8',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  clubImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 12,
+  },
+  clubInfo: {
+    flex: 1,
+  },
+  clubName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  clubDescription: {
+    fontSize: 14,
+    color: '#666',
+  },
+  noClubsText: {
+    fontSize: 16,
+    color: '#666',
+    fontStyle: 'italic',
   },
 });
 
