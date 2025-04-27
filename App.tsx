@@ -30,6 +30,7 @@ import GroupChatScreen from './src/screens/GroupChatScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import AllMembersScreen from './src/screens/AllMembersScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+import AnnouncementsScreen from './src/screens/AnnouncementsScreen';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -47,12 +48,14 @@ type RootStackParamList = {
   CreateProfile: undefined;
   GroupChat: { clubId: string; clubName: string };
   AllMembers: { members: any[]; clubName: string };
+  Profile: undefined;
 };
 
 type TabParamList = {
   Home: undefined;
   Clubs: undefined;
   Calendar: undefined;
+  Announcements: undefined;
   Profile: undefined;
 };
 
@@ -267,6 +270,8 @@ const MainApp = () => {
             iconName = focused ? 'people' : 'people-outline';
           } else if (route.name === 'Calendar') {
             iconName = focused ? 'calendar' : 'calendar-outline';
+          } else if (route.name === 'Announcements') {
+            iconName = focused ? 'megaphone' : 'megaphone-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           }
@@ -325,6 +330,21 @@ const MainApp = () => {
         component={EventScreen}
         options={{
           title: 'Calendar',
+          headerStyle: {
+            backgroundColor: '#FF3B30',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerShown: true
+        }}
+      />
+      <Tab.Screen 
+        name="Announcements" 
+        component={AnnouncementsScreen}
+        options={{
+          title: 'Announcements',
           headerStyle: {
             backgroundColor: '#FF3B30',
           },

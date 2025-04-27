@@ -5,6 +5,7 @@ export type RootStackParamList = {
   Clubs: undefined;
   Calendar: undefined;
   Profile: undefined;
+  Announcements: undefined;
   ClubDetails: { club: Club };
   GroupChat: { club: Club };
   MemberProfile: { member: User };
