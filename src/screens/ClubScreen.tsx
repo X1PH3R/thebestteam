@@ -31,7 +31,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 const CLUBS: Club[] = [
   {
     id: '1',
-    name: 'Photography Club',
+    name: 'STJ ACM',
     description: 'Join us to explore the world through your lens!',
     image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Q2hpYHx8&auto=format&fit=crop&w=1638&q=80',
     members: [],
@@ -52,7 +52,7 @@ const CLUBS: Club[] = [
   },
   {
     id: '2',
-    name: 'Chess Club',
+    name: 'STJ Cyberstorm',
     description: 'Challenge your mind and make new friends!',
     image: 'https://images.unsplash.com/photo-1517524285303-d6fc683dddf8?auto=format&fit=crop&w=800&q=80',
     members: [],
