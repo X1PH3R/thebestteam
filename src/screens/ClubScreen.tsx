@@ -10,81 +10,108 @@ import {
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { Club, User, Event } from '../types';
 
 type RootStackParamList = {
-  Clubs: undefined;
-  Events: undefined;
-  ClubDetails: { club: any };
+  Home: undefined;
+  Login: undefined;
+  Register: undefined;
+  ForgotPassword: undefined;
+  CreateProfile: undefined;
   MyClubs: undefined;
+  ExploreClubs: undefined;
+  ClubDetails: { club: Club };
+  GroupChat: { clubId: string; clubName: string };
+  EventAttendance: { event: Event };
+  MemberProfile: { member: User };
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-const CLUBS = [
+const CLUBS: Club[] = [
   {
     id: '1',
     name: 'Photography Club',
-    category: 'Arts',
-    memberCount: 45,
     description: 'Join us to explore the world through your lens!',
-    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Y2hpYHx8&auto=format&fit=crop&w=1638&q=80',
-    members: [
-      { id: 1, name: 'John Doe', role: 'President', imageUrl: 'https://via.placeholder.com/50' },
-      { id: 2, name: 'Jane Smith', role: 'Vice President', imageUrl: 'https://via.placeholder.com/50' },
-      { id: 3, name: 'Mike Johnson', role: 'Treasurer', imageUrl: 'https://via.placeholder.com/50' },
-      { id: 4, name: 'Sarah Wilson', role: 'Member', imageUrl: 'https://via.placeholder.com/50' }
-    ],
-    meetingTimes: [
-      { day: 'Monday', time: '3:00 PM', location: 'Room 101', frequency: 'Weekly' },
-      { day: 'Thursday', time: '3:00 PM', location: 'Room 101', frequency: 'Weekly' }
-    ],
-    calendarLink: 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Photography+Club+Meeting&details=Weekly+club+meeting&location=Room+101'
+    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Q2hpYHx8&auto=format&fit=crop&w=1638&q=80',
+    members: [],
+    events: [],
+    location: {
+      name: 'Room 101',
+      latitude: 0,
+      longitude: 0
+    },
+    calendarLink: 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Photography+Club+Meeting&details=Weekly+club+meeting&location=Room+101',
+    meetings: [
+      {
+        day: 'Monday',
+        time: '15:00',
+        frequency: 'weekly'
+      }
+    ]
   },
   {
     id: '2',
     name: 'Chess Club',
-    category: 'Games',
-    memberCount: 30,
     description: 'Challenge your mind and make new friends!',
     image: 'https://images.unsplash.com/photo-1517524285303-d6fc683dddf8?auto=format&fit=crop&w=800&q=80',
-    members: [
-      { id: 1, name: 'Alice Brown', role: 'President', imageUrl: 'https://via.placeholder.com/50' },
-      { id: 2, name: 'Bob White', role: 'Vice President', imageUrl: 'https://via.placeholder.com/50' }
-    ],
-    meetingTimes: [
-      { day: 'Wednesday', time: '4:00 PM', location: 'Room 203', frequency: 'Weekly' }
-    ],
-    calendarLink: 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Chess+Club+Meeting&details=Weekly+club+meeting&location=Room+203'
+    members: [],
+    events: [],
+    location: {
+      name: 'Room 203',
+      latitude: 0,
+      longitude: 0
+    },
+    calendarLink: 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Chess+Club+Meeting&details=Weekly+club+meeting&location=Room+203',
+    meetings: [
+      {
+        day: 'Wednesday',
+        time: '16:00',
+        frequency: 'weekly'
+      }
+    ]
   },
   {
     id: '3',
     name: 'Hiking Club',
-    category: 'Outdoors',
-    memberCount: 60,
     description: 'Explore nature and stay active!',
-    image: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Y2hpYHx8&auto=format&fit=crop&w=1638&q=80',
-    members: [
-      { id: 1, name: 'Chris Green', role: 'President', imageUrl: 'https://via.placeholder.com/50' }
-    ],
-    meetingTimes: [
-      { day: 'Saturday', time: '9:00 AM', location: 'Various Locations', frequency: 'Weekly' }
-    ],
-    calendarLink: 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Hiking+Club+Meeting&details=Weekly+hike&location=Various+Locations'
+    image: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Q2hpYHx8&auto=format&fit=crop&w=1638&q=80',
+    members: [],
+    events: [],
+    location: {
+      name: 'Various Locations',
+      latitude: 0,
+      longitude: 0
+    },
+    calendarLink: 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Hiking+Club+Meeting&details=Weekly+hike&location=Various+Locations',
+    meetings: [
+      {
+        day: 'Saturday',
+        time: '09:00',
+        frequency: 'biweekly'
+      }
+    ]
   },
   {
     id: '4',
     name: 'Book Club',
-    category: 'Literature',
-    memberCount: 25,
     description: 'Share your love for reading!',
-    image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Y2hpYHx8&auto=format&fit=crop&w=1638&q=80',
-    members: [
-      { id: 1, name: 'Emily Clark', role: 'President', imageUrl: 'https://via.placeholder.com/50' }
-    ],
-    meetingTimes: [
-      { day: 'Tuesday', time: '5:00 PM', location: 'Library Room A', frequency: 'Monthly' }
-    ],
-    calendarLink: 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Book+Club+Meeting&details=Monthly+book+discussion&location=Library+Room+A'
+    image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Q2hpYHx8&auto=format&fit=crop&w=1638&q=80',
+    members: [],
+    events: [],
+    location: {
+      name: 'Library Room A',
+      latitude: 0,
+      longitude: 0
+    },
+    calendarLink: 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Book+Club+Meeting&details=Monthly+book+discussion&location=Library+Room+A',
+    meetings: [
+      {
+        day: 'Friday',
+        time: '17:00',
+        frequency: 'monthly'
+      }
+    ]
   }
 ];
 
@@ -94,7 +121,7 @@ const ExploreScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const searchInputRef = useRef<TextInput>(null);
 
-  const categories = ['All', 'Arts', 'Games', 'Outdoors', 'Literature'];
+  const categories = ['All', 'Arts', 'Sports', 'Academic', 'Social'];
 
   useFocusEffect(
     React.useCallback(() => {
@@ -106,10 +133,22 @@ const ExploreScreen = () => {
     }, [])
   );
 
+  const getClubCategory = (club: Club) => {
+    // Derive category from club name or description for filtering
+    const lowerName = club.name.toLowerCase();
+    const lowerDesc = club.description.toLowerCase();
+    
+    if (lowerName.includes('photo') || lowerDesc.includes('art')) return 'Arts';
+    if (lowerName.includes('chess')) return 'Academic';
+    if (lowerName.includes('hiking')) return 'Sports';
+    if (lowerName.includes('book')) return 'Social';
+    return 'Social'; // Default category
+  };
+
   const filteredClubs = CLUBS.filter(club => {
     const matchesSearch = club.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          club.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || club.category === selectedCategory;
+    const matchesCategory = selectedCategory === 'All' || getClubCategory(club) === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -159,17 +198,27 @@ const ExploreScreen = () => {
           <TouchableOpacity
             key={club.id}
             style={styles.clubCard}
-            onPress={() => navigation.navigate('ClubDetails', { club })}
+            onPress={() => {
+              console.log('Attempting to navigate...');
+              console.log('Navigation object:', navigation);
+              console.log('Club data:', club);
+              try {
+                navigation.navigate('ClubDetails', { club });
+                console.log('Navigation called successfully');
+              } catch (error) {
+                console.error('Navigation error:', error);
+              }
+            }}
           >
             <Image
-              source={typeof club.image === 'string' ? { uri: club.image } : club.image}
+              source={{ uri: club.image }}
               style={styles.clubImage}
             />
             <View style={styles.clubInfo}>
               <Text style={styles.clubName}>{club.name}</Text>
               <View style={styles.clubMeta}>
-                <Text style={styles.clubCategory}>{club.category}</Text>
-                <Text style={styles.clubMembers}>{club.memberCount} members</Text>
+                <Text style={styles.clubCategory}>{getClubCategory(club)}</Text>
+                <Text style={styles.clubMembers}>{club.members.length} members</Text>
               </View>
               <Text style={styles.clubDescription} numberOfLines={2}>
                 {club.description}

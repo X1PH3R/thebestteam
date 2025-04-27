@@ -1,5 +1,6 @@
 import React from 'react';
-import {View, Text, StyleSheet, Button} from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { useJoinedClubs } from '../context/JoinedClubsContext';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 type RootStackParamList = {
@@ -11,13 +12,20 @@ type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
 };
 
-const HomeScreen = ({navigation}: HomeScreenProps) => {
+const HomeScreen = ({ navigation }: HomeScreenProps) => {
+  const { joinedClubs } = useJoinedClubs();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Home Screen</Text>
-      <Button
-        title="Go to Details"
-        onPress={() => navigation.navigate('Details')}
+      <Text style={styles.title}>My Clubs</Text>
+      <FlatList
+        data={joinedClubs}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.clubItem}>
+            <Text style={styles.clubName}>{item.name}</Text>
+          </View>
+        )}
       />
     </View>
   );
@@ -26,12 +34,21 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
   },
   title: {
     fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 20,
+  },
+  clubItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  clubName: {
+    fontSize: 18,
   },
 });
 

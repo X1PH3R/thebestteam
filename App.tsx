@@ -26,6 +26,8 @@ import MemberProfileScreen from './src/screens/MemberProfileScreen';
 import CreateProfileScreen from './src/screens/CreateProfileScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
+import GroupChatScreen from './src/screens/GroupChatScreen';
+import HomeScreen from './src/screens/HomeScreen';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -41,11 +43,13 @@ type RootStackParamList = {
   ExploreClubs: undefined;
   MemberProfile: { member: any };
   CreateProfile: undefined;
+  GroupChat: undefined;
 };
 
 type TabParamList = {
   Home: undefined;
-  Explore: undefined;
+  Clubs: undefined;
+  Calendar: undefined;
   Profile: undefined;
 };
 
@@ -198,20 +202,20 @@ const MainApp = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }: { focused: boolean; color: string; size: number }) => {
-          let iconName: string;
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName: keyof typeof Ionicons.glyphMap = 'help-outline';
 
           if (route.name === 'Home') {
-            iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'Explore') {
-            iconName = focused ? 'compass' : 'compass-outline';
+            iconName = focused ? 'search' : 'search-outline';
+          } else if (route.name === 'Clubs') {
+            iconName = focused ? 'people' : 'people-outline';
+          } else if (route.name === 'Calendar') {
+            iconName = focused ? 'calendar' : 'calendar-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
-          } else {
-            iconName = 'help';
           }
 
-          return <Ionicons name={iconName as any} size={size} color={color} />;
+          return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#007AFF',
         tabBarInactiveTintColor: 'gray',
@@ -237,23 +241,36 @@ const MainApp = () => {
           fontWeight: '600',
           marginBottom: 5,
         },
-        tabBarIconStyle: {
-          marginBottom: -5,
-        },
       })}
     >
       <Tab.Screen 
-        name="Explore" 
+        name="Home" 
         component={ExploreStack}
         options={{
-          title: 'Explore',
+          title: 'Explore Clubs',
+          headerShown: false
         }}
       />
       <Tab.Screen 
-        name="Home" 
+        name="Clubs" 
         component={HomeStack}
         options={{
-          title: 'Home',
+          headerShown: false
+        }}
+      />
+      <Tab.Screen 
+        name="Calendar" 
+        component={EventScreen}
+        options={{
+          title: 'Calendar',
+          headerStyle: {
+            backgroundColor: '#007AFF',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerShown: true
         }}
       />
       <Tab.Screen 
@@ -261,6 +278,14 @@ const MainApp = () => {
         component={CreateProfileScreen}
         options={{
           title: 'Profile',
+          headerStyle: {
+            backgroundColor: '#007AFF',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerShown: true
         }}
       />
     </Tab.Navigator>

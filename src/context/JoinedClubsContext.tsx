@@ -1,25 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-export interface Club {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
-  image: any;
-  memberCount: number;
-  meetingTimes: Array<{
-    day: string;
-    time: string;
-    location: string;
-    frequency: string;
-  }>;
-  calendarLink: string;
-  upcomingEvents: Array<{
-    title: string;
-    date: string;
-    description: string;
-  }>;
-}
+import type { Club } from '../types';
 
 interface JoinedClubsContextType {
   joinedClubs: Club[];

@@ -40,6 +40,11 @@ export interface Club {
     longitude: number;
   };
   calendarLink?: string;
+  meetings?: {
+    day: string;  // e.g., "Monday", "Tuesday", etc.
+    time: string; // e.g., "14:00"
+    frequency: string; // e.g., "weekly", "biweekly"
+  }[];
 }
 
 export interface Event {
@@ -53,6 +58,7 @@ export interface Event {
     longitude: number;
   };
   attendees: User[];
+  clubName?: string;
 }
 
 export interface Message {

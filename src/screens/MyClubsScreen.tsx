@@ -1,78 +1,58 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Linking } from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useJoinedClubs } from '../context/JoinedClubsContext';
-import { Agenda } from 'react-native-calendars';
-import type { Club } from '../context/JoinedClubsContext';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { Club } from '../types';
 
 type RootStackParamList = {
-  MyClubs: { joinedClub?: any };
-  Explore: undefined;
-  ClubDetails: { club: any };
-};
-
-type TabParamList = {
   Home: undefined;
-  Explore: undefined;
+  GroupChat: undefined;
+  ClubDetails: { club: Club };
 };
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList> & BottomTabNavigationProp<TabParamList>;
-type MyClubsRouteProp = RouteProp<RootStackParamList, 'MyClubs'>;
-
-interface Meeting {
-  day: string;
-  time: string;
-  location: string;
-  frequency: string;
-}
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const MyClubsScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const route = useRoute<MyClubsRouteProp>();
   const { joinedClubs } = useJoinedClubs();
 
-  // Prepare agenda items
-  const agendaItems = useMemo(() => {
-    const items: Record<string, any[]> = {};
-    const today = new Date();
-    for (let offset = 0; offset < 30; offset++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + offset);
-      const dateString = date.toISOString().split('T')[0];
-      items[dateString] = []; // Always initialize as empty array
-      joinedClubs.forEach(club => {
-        (club.meetingTimes ?? []).forEach(meeting => {
-          const dayOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].indexOf(meeting.day);
-          // For weekly meetings, add if day matches
-          if (meeting.frequency.toLowerCase() === 'weekly' && date.getDay() === dayOfWeek) {
-            items[dateString].push({ club, meeting });
-          }
-          // For monthly meetings, add if day and week match (simple: first occurrence in month)
-          if (meeting.frequency.toLowerCase() === 'monthly' && date.getDay() === dayOfWeek && date.getDate() <= 7) {
-            items[dateString].push({ club, meeting });
-          }
-        });
-      });
-    }
-    return items;
-  }, [joinedClubs]);
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('GroupChat')}
+          style={styles.chatButton}
+        >
+          <Ionicons name="chatbubbles-outline" size={24} color="#fff" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
 
-  // Handle new club from navigation params
-  React.useEffect(() => {
-    if (route.params?.joinedClub) {
-      // This is a placeholder implementation. In a real application, you might want to add the new club to the context
-    }
-  }, [route.params?.joinedClub]);
+  const renderClubCard = ({ item }: { item: Club }) => (
+    <TouchableOpacity
+      style={styles.clubCard}
+      onPress={() => navigation.navigate('ClubDetails', { club: item })}
+    >
+      {item.image && (
+        <Image
+          source={{ uri: item.image }}
+          style={styles.clubImage}
+        />
+      )}
+      <View style={styles.clubInfo}>
+        <Text style={styles.clubName}>{item.name}</Text>
+        <Text style={styles.memberCount}>{item.members.length} members</Text>
+        <Text style={styles.clubDescription} numberOfLines={2}>
+          {item.description}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
 
-  const handleExplorePress = () => {
-    // Navigate to the Explore tab
-    navigation.navigate('Explore');
-  };
-
-  if (joinedClubs.length === 0) {
+  if (!joinedClubs || joinedClubs.length === 0) {
     return (
       <View style={styles.emptyContainer}>
         <Ionicons name="people-outline" size={80} color="#007AFF" />
@@ -80,7 +60,7 @@ const MyClubsScreen = () => {
         <Text style={styles.emptyText}>Join clubs to see them here</Text>
         <TouchableOpacity 
           style={styles.exploreButton}
-          onPress={handleExplorePress}
+          onPress={() => navigation.navigate('Home')}
         >
           <Text style={styles.exploreButtonText}>Explore Clubs</Text>
         </TouchableOpacity>
@@ -89,36 +69,14 @@ const MyClubsScreen = () => {
   }
 
   return (
-    <Agenda
-      items={agendaItems}
-      renderItem={(
-        { club, meeting }: { club: Club; meeting: Meeting },
-        isFirst: boolean
-      ) => (
-        <View style={styles.eventCard}>
-          <Text style={styles.eventTitle}>{club.name}</Text>
-          <Text style={styles.eventDate}>{meeting.day} • {meeting.time}</Text>
-          <Text style={styles.eventDescription}>{meeting.location} ({meeting.frequency})</Text>
-          {club.calendarLink && (
-            <TouchableOpacity onPress={() => Linking.openURL(club.calendarLink)} style={styles.googleCalendarButton}>
-              <Ionicons name="logo-google" size={16} color="#fff" />
-              <Text style={styles.googleCalendarButtonText}>Add to Google Calendar</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      )}
-      renderEmptyDate={() => (
-        <View style={styles.eventCard}>
-          <Text style={styles.eventDescription}>No meetings for this day.</Text>
-        </View>
-      )}
-      theme={{
-        agendaDayTextColor: '#007AFF',
-        agendaDayNumColor: '#007AFF',
-        agendaTodayColor: '#007AFF',
-        agendaKnobColor: '#007AFF',
-      }}
-    />
+    <View style={styles.container}>
+      <FlatList
+        data={joinedClubs}
+        keyExtractor={(item) => item.id}
+        renderItem={renderClubCard}
+        contentContainerStyle={styles.listContent}
+      />
+    </View>
   );
 };
 
@@ -127,17 +85,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  header: {
-    padding: 20,
-    backgroundColor: '#007AFF',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  clubList: {
-    padding: 20,
+  listContent: {
+    padding: 16,
   },
   clubCard: {
     backgroundColor: '#fff',
@@ -151,12 +100,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    overflow: 'hidden',
   },
   clubImage: {
     width: '100%',
     height: 150,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    resizeMode: 'cover',
   },
   clubInfo: {
     padding: 16,
@@ -166,7 +115,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 4,
   },
-  clubCategory: {
+  memberCount: {
     fontSize: 14,
     color: '#666',
     marginBottom: 8,
@@ -206,69 +155,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  section: {
-    padding: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  eventCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  eventTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  eventDate: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
-  },
-  eventDescription: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-  },
-  calendarButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
-    marginTop: 8,
-  },
-  calendarButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  googleCalendarButton: {
-    backgroundColor: '#34A853',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 5,
-    marginTop: 8,
-  },
-  googleCalendarButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 6,
+  chatButton: {
+    marginRight: 16,
   },
 });
 
