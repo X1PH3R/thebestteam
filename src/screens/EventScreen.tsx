@@ -30,6 +30,18 @@ type MarkedDates = {
       color: string;
       selectedDotColor?: string;
     }>;
+    customStyles?: {
+      container: {
+        backgroundColor: string;
+        borderRadius: number;
+      };
+      text: {
+        color: string;
+      };
+    };
+    startingDay?: boolean;
+    endingDay?: boolean;
+    color?: string;
   };
 };
 
@@ -54,6 +66,8 @@ const EventScreen = () => {
     
     const nextDate = new Date(date);
     nextDate.setDate(date.getDate() + daysUntilTarget);
+    // Set time to midnight UTC to avoid timezone issues
+    nextDate.setUTCHours(0, 0, 0, 0);
     return nextDate;
   };
 
@@ -61,51 +75,53 @@ const EventScreen = () => {
   const getMarkedDates = () => {
     const markedDates: MarkedDates = {};
     const today = new Date();
+    // Set time to midnight UTC to avoid timezone issues
+    today.setUTCHours(0, 0, 0, 0);
     const threeMonthsFromNow = new Date(today.getFullYear(), today.getMonth() + 3, today.getDate());
     
-    // Mark special events
+    // First, mark all dates with the selection style
+    let currentDate = new Date(today);
+    while (currentDate <= threeMonthsFromNow) {
+      const dateString = currentDate.toISOString().split('T')[0];
+      markedDates[dateString] = {
+        marked: false,
+        selected: dateString === selectedDate
+      };
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    // Then, add dots for events and meetings
     joinedClubs.forEach(club => {
       // Add special events
       club.events.forEach(event => {
-        const eventDate = new Date(event.date).toISOString().split('T')[0];
-        if (!markedDates[eventDate]) {
-          markedDates[eventDate] = {
+        const eventDate = new Date(event.date);
+        // Set time to midnight UTC to avoid timezone issues
+        eventDate.setUTCHours(0, 0, 0, 0);
+        const eventDateString = eventDate.toISOString().split('T')[0];
+        if (markedDates[eventDateString]) {
+          markedDates[eventDateString] = {
+            ...markedDates[eventDateString],
             marked: true,
-            dots: [{
-              key: 'event',
-              color: '#FF3B30'
-            }],
-            selected: eventDate === selectedDate
+            dotColor: '#FF3B30'
           };
         }
       });
 
       // Add regular meetings
       if (club.meetings) {
-        let currentDate = new Date(today);
-        
+        currentDate = new Date(today);
         while (currentDate <= threeMonthsFromNow) {
           club.meetings.forEach(meeting => {
             const nextMeeting = getNextWeekday(currentDate, meeting.day);
-            const meetingDate = nextMeeting.toISOString().split('T')[0];
-            
-            if (!markedDates[meetingDate]) {
-              markedDates[meetingDate] = {
+            const meetingDateString = nextMeeting.toISOString().split('T')[0];
+            if (markedDates[meetingDateString]) {
+              markedDates[meetingDateString] = {
+                ...markedDates[meetingDateString],
                 marked: true,
-                dots: [{
-                  key: 'meeting',
-                  color: '#34C759',
-                }],
-                selected: meetingDate === selectedDate
+                dotColor: '#FF3B30'
               };
-            } else if (markedDates[meetingDate].dots) {
-              markedDates[meetingDate].dots?.push({
-                key: 'meeting',
-                color: '#34C759'
-              });
             }
           });
-          
           currentDate.setDate(currentDate.getDate() + 7);
         }
       }
@@ -178,11 +194,7 @@ const EventScreen = () => {
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: '#FF3B30' }]} />
-          <Text style={styles.legendText}>Special Events</Text>
-        </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#34C759' }]} />
-          <Text style={styles.legendText}>Regular Meetings</Text>
+          <Text style={styles.legendText}>Club Events & Meetings</Text>
         </View>
       </View>
 
@@ -191,21 +203,24 @@ const EventScreen = () => {
         theme={{
           calendarBackground: '#ffffff',
           textSectionTitleColor: '#b6c1cd',
-          selectedDayBackgroundColor: '#FF3B30',
-          selectedDayTextColor: '#ffffff',
+          selectedDayBackgroundColor: '#E5E5E5',
+          selectedDayTextColor: '#000000',
           todayTextColor: '#FF3B30',
           dayTextColor: '#2d4150',
           textDisabledColor: '#d9e1e8',
           dotColor: '#FF3B30',
-          selectedDotColor: '#ffffff',
+          selectedDotColor: '#FF3B30',
           arrowColor: '#FF3B30',
           monthTextColor: '#2d4150',
           indicatorColor: '#FF3B30',
         }}
-        markingType="multi-dot"
+        markingType="simple"
         markedDates={getMarkedDates()}
         onDayPress={onDayPress}
         enableSwipeMonths={true}
+        hideExtraDays={true}
+        showWeekNumbers={false}
+        firstDay={1}
       />
 
       {selectedDate && (
