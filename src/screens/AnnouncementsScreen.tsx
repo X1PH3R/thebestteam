@@ -1,12 +1,13 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Share, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useJoinedClubs } from '../context/JoinedClubsContext';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types';
+import { LinearGradient } from 'expo-linear-gradient';
 
-// Mock announcements data
+// Mock announcements data with images
 const mockAnnouncements = [
   {
     id: '1',
@@ -14,6 +15,10 @@ const mockAnnouncements = [
     title: 'Weekly Meeting This Friday',
     content: 'Join us for our weekly meeting! We will be discussing upcoming projects and events.',
     date: '2024-03-30',
+    image: 'https://picsum.photos/200/200?random=1',
+    clubId: '1',
+    likes: Math.floor(Math.random() * 100),
+    isLiked: false,
   },
   {
     id: '2',
@@ -21,6 +26,10 @@ const mockAnnouncements = [
     title: 'New Equipment Available',
     content: 'We have new cybersecurity tools available for member use. Book your slot now!',
     date: '2024-03-29',
+    image: 'https://picsum.photos/200/200?random=2',
+    clubId: '2',
+    likes: Math.floor(Math.random() * 100),
+    isLiked: false,
   },
   {
     id: '3',
@@ -28,6 +37,10 @@ const mockAnnouncements = [
     title: 'Weekend Hike',
     content: 'Join us for a beautiful hike this Sunday at Bear Mountain!',
     date: '2024-03-28',
+    image: 'https://picsum.photos/200/200?random=3',
+    clubId: '3',
+    likes: Math.floor(Math.random() * 100),
+    isLiked: false,
   },
   {
     id: '4',
@@ -35,18 +48,81 @@ const mockAnnouncements = [
     title: 'Next Book Selection',
     content: 'Our next book will be "The Great Gatsby". Join us for the discussion next week!',
     date: '2024-03-27',
+    image: 'https://picsum.photos/200/200?random=4',
+    clubId: '4',
+    likes: Math.floor(Math.random() * 100),
+    isLiked: false,
   },
 ];
 
 const AnnouncementsScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { joinedClubs } = useJoinedClubs();
+  const [announcements, setAnnouncements] = useState(mockAnnouncements.map(announcement => ({
+    ...announcement,
+    isLiked: false
+  })));
+
+  const handleLike = (announcementId: string) => {
+    setAnnouncements(currentAnnouncements => {
+      return currentAnnouncements.map(announcement => {
+        if (announcement.id === announcementId) {
+          const newIsLiked = !announcement.isLiked;
+          return {
+            ...announcement,
+            isLiked: newIsLiked,
+            likes: newIsLiked ? announcement.likes + 1 : announcement.likes - 1
+          };
+        }
+        return announcement;
+      });
+    });
+  };
+
+  const handleComment = (announcementId: string) => {
+    Alert.alert(
+      'Comments',
+      'Comment functionality coming soon!',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleShare = async (announcement: typeof mockAnnouncements[0]) => {
+    try {
+      await Share.share({
+        message: `${announcement.title}\n\n${announcement.content}\n\nShared from ${announcement.clubName}`,
+        title: announcement.title,
+      });
+    } catch (error) {
+      Alert.alert('Error', 'Failed to share announcement');
+    }
+  };
+
+  const handleClubPress = (clubId: string) => {
+    const club = joinedClubs.find(c => c.id === clubId);
+    if (club) {
+      navigation.navigate('ClubDetails', { club });
+    } else {
+      console.log(`Club with ID ${clubId} not found in joined clubs`);
+      Alert.alert(
+        'Club Not Found',
+        'The club associated with this announcement is no longer available.',
+        [{ text: 'OK' }]
+      );
+    }
+  };
 
   if (!joinedClubs || joinedClubs.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="megaphone-outline" size={80} color="#FF3B30" />
-        <Text style={styles.emptyText}>Join clubs to see their announcements</Text>
+        <LinearGradient
+          colors={['#FF3B30', '#FF6B6B']}
+          style={styles.emptyIconContainer}
+        >
+          <Ionicons name="megaphone-outline" size={80} color="#fff" />
+        </LinearGradient>
+        <Text style={styles.emptyTitle}>No Clubs Joined</Text>
+        <Text style={styles.emptyText}>Join clubs to see their announcements and stay updated with the latest news!</Text>
         <TouchableOpacity
           style={styles.exploreButton}
           onPress={() => navigation.navigate('Home')}
@@ -59,15 +135,21 @@ const AnnouncementsScreen = () => {
 
   // Filter announcements to only show those from joined clubs
   const joinedClubNames = joinedClubs.map(club => club.name);
-  const filteredAnnouncements = mockAnnouncements.filter(announcement => 
+  const filteredAnnouncements = announcements.filter(announcement => 
     joinedClubNames.includes(announcement.clubName)
   );
 
   if (filteredAnnouncements.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="megaphone-outline" size={80} color="#FF3B30" />
-        <Text style={styles.emptyText}>No announcements from your clubs yet</Text>
+        <LinearGradient
+          colors={['#FF3B30', '#FF6B6B']}
+          style={styles.emptyIconContainer}
+        >
+          <Ionicons name="megaphone-outline" size={80} color="#fff" />
+        </LinearGradient>
+        <Text style={styles.emptyTitle}>No Announcements Yet</Text>
+        <Text style={styles.emptyText}>Your clubs haven't posted any announcements yet. Check back later!</Text>
         <TouchableOpacity
           style={styles.exploreButton}
           onPress={() => navigation.navigate('Home')}
@@ -82,12 +164,52 @@ const AnnouncementsScreen = () => {
     <ScrollView style={styles.container}>
       {filteredAnnouncements.map((announcement) => (
         <View key={announcement.id} style={styles.announcementCard}>
-          <View style={styles.header}>
-            <Text style={styles.clubName}>{announcement.clubName}</Text>
-            <Text style={styles.date}>{announcement.date}</Text>
+          <LinearGradient
+            colors={['#FF3B30', '#FF6B6B']}
+            style={styles.cardHeader}
+          >
+            <View style={styles.clubInfo}>
+              <Image 
+                source={{ uri: announcement.image }} 
+                style={styles.clubImage}
+              />
+              <View>
+                <Text style={styles.clubName}>{announcement.clubName}</Text>
+                <Text style={styles.date}>{announcement.date}</Text>
+              </View>
+            </View>
+          </LinearGradient>
+          <View style={styles.cardContent}>
+            <Text style={styles.title}>{announcement.title}</Text>
+            <Text style={styles.content}>{announcement.content}</Text>
+            <View style={styles.actions}>
+              <TouchableOpacity 
+                style={styles.actionButton}
+                onPress={() => handleLike(announcement.id)}
+              >
+                <Ionicons 
+                  name={announcement.isLiked ? "heart" : "heart-outline"} 
+                  size={20} 
+                  color="#FF3B30" 
+                />
+                <Text style={styles.actionText}>{announcement.likes} Likes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.actionButton}
+                onPress={() => handleComment(announcement.id)}
+              >
+                <Ionicons name="chatbubble-outline" size={20} color="#FF3B30" />
+                <Text style={styles.actionText}>Comment</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.actionButton}
+                onPress={() => handleShare(announcement)}
+              >
+                <Ionicons name="share-outline" size={20} color="#FF3B30" />
+                <Text style={styles.actionText}>Share</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <Text style={styles.title}>{announcement.title}</Text>
-          <Text style={styles.content}>{announcement.content}</Text>
         </View>
       ))}
     </ScrollView>
@@ -97,21 +219,36 @@ const AnnouncementsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8f9fa',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8f9fa',
     padding: 20,
   },
+  emptyIconContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 10,
+  },
   emptyText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#666',
     textAlign: 'center',
-    marginTop: 20,
-    marginBottom: 20,
+    marginBottom: 30,
+    paddingHorizontal: 20,
+    lineHeight: 24,
   },
   exploreButton: {
     backgroundColor: '#FF3B30',
@@ -127,44 +264,79 @@ const styles = StyleSheet.create({
   exploreButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   announcementCard: {
     backgroundColor: '#fff',
     margin: 10,
-    padding: 15,
-    borderRadius: 10,
-    elevation: 2,
+    borderRadius: 15,
+    overflow: 'hidden',
+    elevation: 5,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
-  header: {
+  cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    padding: 15,
+  },
+  clubInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  clubImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+    borderWidth: 2,
+    borderColor: '#fff',
   },
   clubName: {
-    fontSize: 14,
-    color: '#FF3B30',
+    fontSize: 16,
+    color: '#fff',
     fontWeight: '600',
   },
   date: {
     fontSize: 12,
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.8)',
+    marginTop: 2,
+  },
+  cardContent: {
+    padding: 15,
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 8,
     color: '#333',
+    marginBottom: 10,
   },
   content: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#444',
-    lineHeight: 20,
+    lineHeight: 22,
+    marginBottom: 15,
+  },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    paddingTop: 15,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+  },
+  actionText: {
+    color: '#FF3B30',
+    marginLeft: 5,
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 
