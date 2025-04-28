@@ -36,11 +36,18 @@ export interface Club {
   description: string;
   photoURL?: string;
   image?: string;
-  members: string[];
-  admins: string[];
+  members: User[];
+  admins: User[];
   events: Event[];
   announcements: Announcement[];
   groupChatId?: string;
+  location?: {
+    name: string;
+    latitude: number;
+    longitude: number;
+  };
+  calendarLink?: string;
+  meetings?: Meeting[];
 }
 
 export interface Event {

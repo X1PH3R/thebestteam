@@ -34,8 +34,18 @@ const CLUBS: Club[] = [
     name: 'STJ ACM',
     description: 'Join us to explore the world through your lens!',
     image: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.licdn.com%2Fdms%2Fimage%2Fv2%2FC4E0BAQFjWELOoWObiQ%2Fcompany-logo_200_200%2Fcompany-logo_200_200%2F0%2F1645384621406%2Fsjuacm_logo%3Fe%3D2147483647%26v%3Dbeta%26t%3DUtTcv0BCxoIZ2EsiO7usV1VaQ224WES21a7-x1NU2_c&f=1&nofb=1&ipt=842b1ec1b19e09c8718786ee538aff2c6932aad08ed6211e07eb3f7f7671e0b7',
-    members: [],
+    members: [
+      { id: '1', email: 'sarah@example.com', displayName: 'Sarah Johnson', major: 'Computer Science' },
+      { id: '2', email: 'michael@example.com', displayName: 'Michael Chen', major: 'Software Engineering' },
+      { id: '3', email: 'alex@example.com', displayName: 'Alex Rodriguez', major: 'Data Science' },
+      { id: '4', email: 'emily@example.com', displayName: 'Emily Davis', major: 'Computer Science' },
+      { id: '5', email: 'david@example.com', displayName: 'David Kim', major: 'Information Technology' }
+    ],
+    admins: [
+      { id: 'admin1', email: 'smith@example.com', displayName: 'Professor Smith', major: 'Computer Science' }
+    ],
     events: [],
+    announcements: [],
     location: {
       name: 'Room 101',
       latitude: 0,
@@ -55,8 +65,17 @@ const CLUBS: Club[] = [
     name: 'STJ Cyberstorm',
     description: 'Challenge your mind and make new friends!',
     image: 'https://redstormsports.com/custompages/gallery/The_Red_Storm_Thunderbird_Meet_St_John_s_New_Mascot__09_17_2009_genrel/2590433.jpeg?width=1024&height=682',
-    members: [],
+    members: [
+      { id: '6', email: 'james@example.com', displayName: 'James Wilson', major: 'Business' },
+      { id: '7', email: 'lisa@example.com', displayName: 'Lisa Thompson', major: 'Marketing' },
+      { id: '8', email: 'robert@example.com', displayName: 'Robert Garcia', major: 'Finance' },
+      { id: '9', email: 'patricia@example.com', displayName: 'Patricia Lee', major: 'Management' }
+    ],
+    admins: [
+      { id: 'admin2', email: 'anderson@example.com', displayName: 'Coach Anderson', major: 'Sports Management' }
+    ],
     events: [],
+    announcements: [],
     location: {
       name: 'Room 203',
       latitude: 0,
@@ -75,9 +94,20 @@ const CLUBS: Club[] = [
     id: '3',
     name: 'Hiking Club',
     description: 'Explore nature and stay active!',
-    image: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Q2hpYHx8&auto=format&fit=crop&w=1638&q=80',
-    members: [],
+    image: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.momondo.de%2Fdiscover%2Fwp-content%2Fuploads%2Fsites%2F264%2F2022%2F08%2FDEST_AUSTRIA_VALLEY_OF_UMBALFAELLE_GROSSVENEDIGER_ROETSPITZE_HOHE_TAUERN_PEOPLE_HIKERS_GettyImages-1358569473.jpg&f=1&nofb=1&ipt=edf57e30384e47722e3e0c1ba28635280409dfcbe4e85d0a46a29c836ee9c1fc',
+    members: [
+      { id: '10', email: 'emma@example.com', displayName: 'Emma Thompson', major: 'Environmental Science' },
+      { id: '11', email: 'daniel@example.com', displayName: 'Daniel Brown', major: 'Biology' },
+      { id: '12', email: 'sophia@example.com', displayName: 'Sophia Martinez', major: 'Geology' },
+      { id: '13', email: 'william@example.com', displayName: 'William Taylor', major: 'Outdoor Education' },
+      { id: '14', email: 'olivia@example.com', displayName: 'Olivia Clark', major: 'Environmental Studies' },
+      { id: '15', email: 'benjamin@example.com', displayName: 'Benjamin White', major: 'Wildlife Biology' }
+    ],
+    admins: [
+      { id: 'admin3', email: 'jackson@example.com', displayName: 'Ranger Jackson', major: 'Park Management' }
+    ],
     events: [],
+    announcements: [],
     location: {
       name: 'Various Locations',
       latitude: 0,
@@ -97,8 +127,16 @@ const CLUBS: Club[] = [
     name: 'Book Club',
     description: 'Share your love for reading!',
     image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Q2hpYHx8&auto=format&fit=crop&w=1638&q=80',
-    members: [],
+    members: [
+      { id: '16', email: 'victoria@example.com', displayName: 'Victoria Adams', major: 'English Literature' },
+      { id: '17', email: 'christopher@example.com', displayName: 'Christopher Moore', major: 'Creative Writing' },
+      { id: '18', email: 'isabella@example.com', displayName: 'Isabella Scott', major: 'Comparative Literature' }
+    ],
+    admins: [
+      { id: 'admin4', email: 'parker@example.com', displayName: 'Librarian Parker', major: 'Library Science' }
+    ],
     events: [],
+    announcements: [],
     location: {
       name: 'Library Room A',
       latitude: 0,
