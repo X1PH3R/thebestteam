@@ -367,10 +367,10 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#FF3B30',
   },
   saveButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#FF3B30',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 5,
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   resumeButtonText: {
-    color: '#007AFF',
+    color: '#FF3B30',
     fontWeight: '600',
   },
 });

@@ -170,7 +170,7 @@ const ClubDetailsScreen = () => {
               onPress={handleViewAllMembers}
             >
               <Text style={styles.viewAllText}>View All</Text>
-              <Ionicons name="chevron-forward" size={16} color="#007AFF" />
+              <Ionicons name="chevron-forward" size={16} color="#FF3B30" />
             </TouchableOpacity>
           </View>
           <View style={styles.membersList}>
@@ -216,7 +216,7 @@ const ClubDetailsScreen = () => {
           style={styles.calendarButton}
           onPress={handleAddToCalendar}
         >
-          <Ionicons name="calendar-outline" size={20} color="#007AFF" />
+          <Ionicons name="calendar-outline" size={20} color="#FF3B30" />
           <Text style={styles.calendarButtonText}>Add to Calendar</Text>
         </TouchableOpacity>
       </View>
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   joinButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#FF3B30',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -334,10 +334,10 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#007AFF',
+    borderColor: '#FF3B30',
   },
   calendarButtonText: {
-    color: '#007AFF',
+    color: '#FF3B30',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   viewAllText: {
-    color: '#007AFF',
+    color: '#FF3B30',
     fontSize: 14,
     fontWeight: '600',
     marginRight: 4,

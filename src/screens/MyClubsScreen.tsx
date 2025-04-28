@@ -66,7 +66,7 @@ const MyClubsScreen = () => {
   if (!joinedClubs || joinedClubs.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="people-outline" size={80} color="#007AFF" />
+        <Ionicons name="people-outline" size={80} color="#FF3B30" />
         <Text style={styles.emptyTitle}>No Clubs Yet</Text>
         <Text style={styles.emptyText}>Join clubs to see them here</Text>
         <TouchableOpacity 
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   exploreButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#FF3B30',
     paddingHorizontal: 30,
     paddingVertical: 15,
     borderRadius: 25,

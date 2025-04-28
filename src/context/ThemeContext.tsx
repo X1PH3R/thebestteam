@@ -13,7 +13,7 @@ export interface Theme {
 }
 
 const lightTheme: Theme = {
-  primary: '#007AFF',
+  primary: '#FF3B30',
   background: '#FFFFFF',
   surface: '#F2F2F7',
   text: '#000000',
@@ -24,7 +24,7 @@ const lightTheme: Theme = {
 };
 
 const darkTheme: Theme = {
-  primary: '#0A84FF',
+  primary: '#FF453A',
   background: '#000000',
   surface: '#1C1C1E',
   text: '#FFFFFF',

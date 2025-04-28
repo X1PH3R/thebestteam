@@ -46,7 +46,7 @@ const ForgotPasswordScreen = ({ navigation }: any) => {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Ionicons name="arrow-back" size={24} color="#007AFF" />
+            <Ionicons name="arrow-back" size={24} color="#FF3B30" />
           </TouchableOpacity>
           <Text style={styles.title}>Reset Password</Text>
         </View>
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#FF3B30',
   },
   formContainer: {
     width: '100%',
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   resetButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#FF3B30',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loginLinkText: {
-    color: '#007AFF',
+    color: '#FF3B30',
     fontSize: 16,
   },
 });

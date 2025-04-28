@@ -110,7 +110,7 @@ const MemberProfileScreen = () => {
             style={styles.contactItem}
             onPress={() => Linking.openURL(`mailto:${member.email}`)}
           >
-            <Ionicons name="mail-outline" size={24} color="#007AFF" />
+            <Ionicons name="mail-outline" size={24} color="#FF3B30" />
             <Text style={styles.contactText}>{member.email}</Text>
           </TouchableOpacity>
         </View>
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   contactText: {
     fontSize: 16,
-    color: '#007AFF',
+    color: '#FF3B30',
     marginLeft: 10,
   },
   socialItem: {
