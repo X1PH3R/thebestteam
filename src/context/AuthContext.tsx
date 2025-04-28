@@ -137,11 +137,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateProfile = async (userData: Partial<User>) => {
     try {
       setIsLoading(true);
-      if (!user) throw new Error('No user logged in');
+      if (!user) {
+        throw new Error('No user logged in');
+      }
+      
+      // Merge existing user data with new data
       const updatedUser = { ...user, ...userData };
+      
+      // Update AsyncStorage
       await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      // Update state
       setUser(updatedUser);
     } catch (error) {
+      console.error('Error updating profile:', error);
       Alert.alert('Error', 'Failed to update profile. Please try again.');
       throw error;
     } finally {

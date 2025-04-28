@@ -125,7 +125,7 @@ const ProfileScreen = () => {
               onPress={() => handleClubPress(club)}
             >
               <Image
-                source={club.photoURL ? { uri: club.photoURL } : undefined}
+                source={club.image ? { uri: club.image } : undefined}
                 style={styles.clubImage}
               />
               <Text style={styles.clubName} numberOfLines={2}>

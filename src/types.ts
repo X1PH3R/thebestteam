@@ -35,6 +35,7 @@ export interface Club {
   name: string;
   description: string;
   photoURL?: string;
+  image?: string;
   members: string[];
   admins: string[];
   events: Event[];

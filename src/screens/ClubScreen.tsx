@@ -33,7 +33,7 @@ const CLUBS: Club[] = [
     id: '1',
     name: 'STJ ACM',
     description: 'Join us to explore the world through your lens!',
-    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8Q2hpYHx8&auto=format&fit=crop&w=1638&q=80',
+    image: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.licdn.com%2Fdms%2Fimage%2Fv2%2FC4E0BAQFjWELOoWObiQ%2Fcompany-logo_200_200%2Fcompany-logo_200_200%2F0%2F1645384621406%2Fsjuacm_logo%3Fe%3D2147483647%26v%3Dbeta%26t%3DUtTcv0BCxoIZ2EsiO7usV1VaQ224WES21a7-x1NU2_c&f=1&nofb=1&ipt=842b1ec1b19e09c8718786ee538aff2c6932aad08ed6211e07eb3f7f7671e0b7',
     members: [],
     events: [],
     location: {
@@ -54,7 +54,7 @@ const CLUBS: Club[] = [
     id: '2',
     name: 'STJ Cyberstorm',
     description: 'Challenge your mind and make new friends!',
-    image: 'https://images.unsplash.com/photo-1517524285303-d6fc683dddf8?auto=format&fit=crop&w=800&q=80',
+    image: 'https://redstormsports.com/custompages/gallery/The_Red_Storm_Thunderbird_Meet_St_John_s_New_Mascot__09_17_2009_genrel/2590433.jpeg?width=1024&height=682',
     members: [],
     events: [],
     location: {

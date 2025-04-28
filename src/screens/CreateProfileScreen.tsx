@@ -33,7 +33,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const CreateProfileScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { register, isLoading, user } = useAuth();
+  const { register, isLoading, user, updateProfile } = useAuth();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [studentId, setStudentId] = useState('');

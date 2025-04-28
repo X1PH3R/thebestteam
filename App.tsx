@@ -133,6 +133,14 @@ const HomeStack = () => (
         headerShown: true,
       }}
     />
+    <Stack.Screen 
+      name="GroupChat" 
+      component={GroupChatScreen}
+      options={{
+        title: 'Group Chat',
+        headerShown: true,
+      }}
+    />
   </Stack.Navigator>
 );
 
@@ -188,6 +196,14 @@ const ExploreStack = () => (
       component={AllMembersScreen}
       options={{
         title: 'Members',
+        headerShown: true,
+      }}
+    />
+    <Stack.Screen 
+      name="GroupChat" 
+      component={GroupChatScreen}
+      options={{
+        title: 'Group Chat',
         headerShown: true,
       }}
     />
