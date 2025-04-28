@@ -153,6 +153,8 @@ const CLUBS: Club[] = [
   }
 ];
 
+export { CLUBS };
+
 const ExploreScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');

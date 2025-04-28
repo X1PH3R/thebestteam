@@ -10,24 +10,31 @@ import type { RootStackParamList } from '../types';
 const mockAnnouncements = [
   {
     id: '1',
-    clubName: 'Chess Club',
-    title: 'Weekly Tournament This Saturday',
-    content: 'Join us for our weekly tournament! All skill levels welcome. Prizes for winners!',
+    clubName: 'STJ ACM',
+    title: 'Weekly Meeting This Friday',
+    content: 'Join us for our weekly meeting! We will be discussing upcoming projects and events.',
     date: '2024-03-30',
   },
   {
     id: '2',
-    clubName: 'Photography Club',
+    clubName: 'STJ Cyberstorm',
     title: 'New Equipment Available',
-    content: 'We have new cameras available for member use. Book your slot now!',
+    content: 'We have new cybersecurity tools available for member use. Book your slot now!',
     date: '2024-03-29',
   },
   {
     id: '3',
-    clubName: 'Chess Club',
-    title: 'Strategy Workshop',
-    content: 'Learn advanced chess strategies from our club master this Sunday.',
+    clubName: 'Hiking Club',
+    title: 'Weekend Hike',
+    content: 'Join us for a beautiful hike this Sunday at Bear Mountain!',
     date: '2024-03-28',
+  },
+  {
+    id: '4',
+    clubName: 'Book Club',
+    title: 'Next Book Selection',
+    content: 'Our next book will be "The Great Gatsby". Join us for the discussion next week!',
+    date: '2024-03-27',
   },
 ];
 
@@ -50,9 +57,30 @@ const AnnouncementsScreen = () => {
     );
   }
 
+  // Filter announcements to only show those from joined clubs
+  const joinedClubNames = joinedClubs.map(club => club.name);
+  const filteredAnnouncements = mockAnnouncements.filter(announcement => 
+    joinedClubNames.includes(announcement.clubName)
+  );
+
+  if (filteredAnnouncements.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Ionicons name="megaphone-outline" size={80} color="#FF3B30" />
+        <Text style={styles.emptyText}>No announcements from your clubs yet</Text>
+        <TouchableOpacity
+          style={styles.exploreButton}
+          onPress={() => navigation.navigate('Home')}
+        >
+          <Text style={styles.exploreButtonText}>Explore More Clubs</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
-      {mockAnnouncements.map((announcement) => (
+      {filteredAnnouncements.map((announcement) => (
         <View key={announcement.id} style={styles.announcementCard}>
           <View style={styles.header}>
             <Text style={styles.clubName}>{announcement.clubName}</Text>

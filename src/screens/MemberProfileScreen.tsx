@@ -12,15 +12,15 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
-import { useJoinedClubs } from '../context/JoinedClubsContext';
-import type { Club } from '../types';
+import type { Club, User } from '../types';
+import { CLUBS } from './ClubScreen';
 
 type RootStackParamList = {
   MyClubs: undefined;
   ClubDetails: { club: Club };
   Events: undefined;
   ExploreClubs: undefined;
-  MemberProfile: { member: any };
+  MemberProfile: { member: User };
   CreateProfile: undefined;
 };
 
@@ -29,15 +29,16 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 const MemberProfileScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
-  const { member } = route.params as { member: any };
-  const { joinedClubs } = useJoinedClubs();
+  const { member } = route.params as { member: User };
 
-  // Filter clubs where this member is a participant
-  const memberClubs = joinedClubs.filter(club => 
-    club.members.some(m => m.id === member.id)
+  // Find all clubs where this member is a participant
+  const memberClubs = CLUBS.filter((club: Club) => 
+    club.members.some((m: User) => m.id === member.id) || 
+    club.admins.some((a: User) => a.id === member.id)
   );
 
-  const handleSocialLink = async (url: string) => {
+  const handleSocialLink = async (url: string | undefined) => {
+    if (!url) return;
     try {
       await Linking.openURL(url);
     } catch (error) {
@@ -50,7 +51,7 @@ const MemberProfileScreen = () => {
       <StatusBar barStyle="light-content" />
       <View style={styles.header}>
         <Image
-          source={{ uri: member.imageUrl || member.photoURL }}
+          source={{ uri: member.photoURL || 'https://via.placeholder.com/150' }}
           style={styles.headerImage}
         />
         <View style={styles.headerOverlay} />
@@ -58,13 +59,7 @@ const MemberProfileScreen = () => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color="#007AFF" />
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.editButton}
-          onPress={() => navigation.navigate('CreateProfile')}
-        >
-          <Ionicons name="create-outline" size={24} color="#007AFF" />
+          <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
@@ -79,7 +74,7 @@ const MemberProfileScreen = () => {
           <Text style={styles.sectionTitle}>Clubs</Text>
           {memberClubs.length > 0 ? (
             <View style={styles.clubsList}>
-              {memberClubs.map((club) => (
+              {memberClubs.map((club: Club) => (
                 <TouchableOpacity
                   key={club.id}
                   style={styles.clubCard}
@@ -150,11 +145,6 @@ const MemberProfileScreen = () => {
             </TouchableOpacity>
           )}
         </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Join Date</Text>
-          <Text style={styles.joinDate}>{member.joinDate || 'Not specified'}</Text>
-        </View>
       </View>
     </ScrollView>
   );
@@ -168,10 +158,6 @@ const styles = StyleSheet.create({
   header: {
     height: 300,
     position: 'relative',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
   },
   headerImage: {
     width: '100%',
@@ -183,10 +169,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.3)',
   },
   backButton: {
-    padding: 8,
-  },
-  editButton: {
-    padding: 8,
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 1,
   },
   content: {
     padding: 20,
@@ -238,10 +224,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     marginLeft: 10,
-  },
-  joinDate: {
-    fontSize: 16,
-    color: '#666',
   },
   clubsList: {
     gap: 12,
