@@ -19,6 +19,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import { Picker } from '@react-native-picker/picker';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 type RootStackParamList = {
   MyClubs: undefined;
@@ -34,6 +35,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 const CreateProfileScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const { register, isLoading, user, updateProfile } = useAuth();
+  const { theme, isDarkMode } = useTheme();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [studentId, setStudentId] = useState('');
@@ -138,17 +140,18 @@ const CreateProfileScreen = () => {
 
   return (
     <KeyboardAvoidingView 
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>
+        <View style={[styles.header, { borderBottomColor: theme.border }]}>
+          <Text style={[styles.headerTitle, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>
             {user ? 'Edit Profile' : 'Create Profile'}
           </Text>
           <TouchableOpacity 
             style={[
               styles.saveButton, 
+              { backgroundColor: theme.primary },
               (!hasUnsavedChanges || isLoading) && styles.disabledButton
             ]}
             onPress={handleSaveProfile}
@@ -164,7 +167,7 @@ const CreateProfileScreen = () => {
 
         <View style={styles.content}>
           <TouchableOpacity 
-            style={styles.imageContainer}
+            style={[styles.imageContainer, { backgroundColor: theme.surface }]}
             onPress={pickImage}
             disabled={isLoading}
           >
@@ -175,45 +178,56 @@ const CreateProfileScreen = () => {
               />
             ) : (
               <View style={styles.placeholderImage}>
-                <Ionicons name="person" size={50} color="#ccc" />
-                <Text style={styles.placeholderText}>Add Photo</Text>
+                <Ionicons name="person" size={50} color={isDarkMode ? '#E0E0E0' : theme.textSecondary} />
+                <Text style={[styles.placeholderText, { color: isDarkMode ? '#E0E0E0' : theme.textSecondary }]}>Add Photo</Text>
               </View>
             )}
           </TouchableOpacity>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Name *</Text>
+            <Text style={[styles.label, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>Name *</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { 
+                backgroundColor: theme.surface,
+                color: isDarkMode ? '#FFFFFF' : theme.text,
+                borderColor: theme.border
+              }]}
               value={name}
               onChangeText={(value) => handleInputChange(setName, value)}
               placeholder="Your name"
-              placeholderTextColor="#999"
+              placeholderTextColor={isDarkMode ? '#666666' : theme.textSecondary}
               editable={!isLoading}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Student ID *</Text>
+            <Text style={[styles.label, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>Student ID *</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { 
+                backgroundColor: theme.surface,
+                color: isDarkMode ? '#FFFFFF' : theme.text,
+                borderColor: theme.border
+              }]}
               value={studentId}
               onChangeText={(value) => handleInputChange(setStudentId, value)}
               placeholder="Your student ID"
-              placeholderTextColor="#999"
-              autoCapitalize="characters"
+              placeholderTextColor={isDarkMode ? '#666666' : theme.textSecondary}
               editable={!isLoading}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email *</Text>
+            <Text style={[styles.label, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>Email *</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { 
+                backgroundColor: theme.surface,
+                color: isDarkMode ? '#FFFFFF' : theme.text,
+                borderColor: theme.border
+              }]}
               value={email}
               onChangeText={(value) => handleInputChange(setEmail, value)}
               placeholder="Your university email"
-              placeholderTextColor="#999"
+              placeholderTextColor={isDarkMode ? '#666666' : theme.textSecondary}
               keyboardType="email-address"
               autoCapitalize="none"
               editable={!isLoading}
@@ -221,120 +235,158 @@ const CreateProfileScreen = () => {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Password *</Text>
+            <Text style={[styles.label, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>Password *</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { 
+                backgroundColor: theme.surface,
+                color: isDarkMode ? '#FFFFFF' : theme.text,
+                borderColor: theme.border
+              }]}
               value={password}
               onChangeText={(value) => handleInputChange(setPassword, value)}
               placeholder="Create a password"
-              placeholderTextColor="#999"
+              placeholderTextColor={isDarkMode ? '#666666' : theme.textSecondary}
               secureTextEntry
               editable={!isLoading}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Confirm Password *</Text>
+            <Text style={[styles.label, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>Confirm Password *</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { 
+                backgroundColor: theme.surface,
+                color: isDarkMode ? '#FFFFFF' : theme.text,
+                borderColor: theme.border
+              }]}
               value={confirmPassword}
               onChangeText={(value) => handleInputChange(setConfirmPassword, value)}
               placeholder="Confirm your password"
-              placeholderTextColor="#999"
+              placeholderTextColor={isDarkMode ? '#666666' : theme.textSecondary}
               secureTextEntry
               editable={!isLoading}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Major</Text>
+            <Text style={[styles.label, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>Major</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { 
+                backgroundColor: theme.surface,
+                color: isDarkMode ? '#FFFFFF' : theme.text,
+                borderColor: theme.border
+              }]}
               value={major}
               onChangeText={(value) => handleInputChange(setMajor, value)}
               placeholder="Your major"
-              placeholderTextColor="#999"
+              placeholderTextColor={isDarkMode ? '#666666' : theme.textSecondary}
               editable={!isLoading}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Year</Text>
-            <View style={styles.pickerContainer}>
+            <Text style={[styles.label, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>Year</Text>
+            <View style={[styles.pickerContainer, { 
+              backgroundColor: theme.surface,
+              borderColor: theme.border
+            }]}>
               <Picker
                 selectedValue={year}
                 onValueChange={(value) => handleInputChange(setYear, value)}
-                style={styles.picker}
+                style={[styles.picker, { color: isDarkMode ? '#FFFFFF' : theme.text }]}
                 enabled={!isLoading}
               >
-                <Picker.Item label="Select your year" value="" />
+                <Picker.Item label="Select year" value="" />
                 {yearOptions.map((option) => (
-                  <Picker.Item key={option} label={option} value={option} />
+                  <Picker.Item 
+                    key={option} 
+                    label={option} 
+                    value={option} 
+                    color={isDarkMode ? '#FFFFFF' : theme.text}
+                  />
                 ))}
               </Picker>
             </View>
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>About</Text>
+            <Text style={[styles.label, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>Bio</Text>
             <TextInput
-              style={[styles.input, styles.textArea]}
+              style={[styles.textArea, { 
+                backgroundColor: theme.surface,
+                color: isDarkMode ? '#FFFFFF' : theme.text,
+                borderColor: theme.border
+              }]}
               value={description}
               onChangeText={(value) => handleInputChange(setDescription, value)}
               placeholder="Tell us about yourself"
-              placeholderTextColor="#999"
+              placeholderTextColor={isDarkMode ? '#666666' : theme.textSecondary}
               multiline
               numberOfLines={4}
-              textAlignVertical="top"
               editable={!isLoading}
             />
           </View>
 
-          <View style={styles.socialSection}>
-            <Text style={styles.sectionTitle}>Social Media</Text>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Instagram</Text>
-              <TextInput
-                style={styles.input}
-                value={instagram}
-                onChangeText={(value) => handleInputChange(setInstagram, value)}
-                placeholder="Your Instagram handle"
-                placeholderTextColor="#999"
-                editable={!isLoading}
-              />
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>LinkedIn</Text>
-              <TextInput
-                style={styles.input}
-                value={linkedin}
-                onChangeText={(value) => handleInputChange(setLinkedin, value)}
-                placeholder="Your LinkedIn profile URL"
-                placeholderTextColor="#999"
-                editable={!isLoading}
-              />
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Twitter</Text>
-              <TextInput
-                style={styles.input}
-                value={twitter}
-                onChangeText={(value) => handleInputChange(setTwitter, value)}
-                placeholder="Your Twitter handle"
-                placeholderTextColor="#999"
-                editable={!isLoading}
-              />
-            </View>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>Social Media</Text>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={[styles.label, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>Instagram</Text>
+            <TextInput
+              style={[styles.input, { 
+                backgroundColor: theme.surface,
+                color: isDarkMode ? '#FFFFFF' : theme.text,
+                borderColor: theme.border
+              }]}
+              value={instagram}
+              onChangeText={(value) => handleInputChange(setInstagram, value)}
+              placeholder="@username"
+              placeholderTextColor={isDarkMode ? '#666666' : theme.textSecondary}
+              editable={!isLoading}
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={[styles.label, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>LinkedIn</Text>
+            <TextInput
+              style={[styles.input, { 
+                backgroundColor: theme.surface,
+                color: isDarkMode ? '#FFFFFF' : theme.text,
+                borderColor: theme.border
+              }]}
+              value={linkedin}
+              onChangeText={(value) => handleInputChange(setLinkedin, value)}
+              placeholder="linkedin.com/in/username"
+              placeholderTextColor={isDarkMode ? '#666666' : theme.textSecondary}
+              editable={!isLoading}
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={[styles.label, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>Twitter</Text>
+            <TextInput
+              style={[styles.input, { 
+                backgroundColor: theme.surface,
+                color: isDarkMode ? '#FFFFFF' : theme.text,
+                borderColor: theme.border
+              }]}
+              value={twitter}
+              onChangeText={(value) => handleInputChange(setTwitter, value)}
+              placeholder="@username"
+              placeholderTextColor={isDarkMode ? '#666666' : theme.textSecondary}
+              editable={!isLoading}
+            />
           </View>
 
           <View style={styles.resumeSection}>
-            <Text style={styles.label}>Resume</Text>
+            <Text style={[styles.label, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>Resume</Text>
             <TouchableOpacity 
-              style={styles.resumeButton}
+              style={[styles.resumeButton, { backgroundColor: theme.surface }]}
               onPress={pickResume}
               disabled={isLoading}
             >
-              <Text style={styles.resumeButtonText}>
+              <Text style={[styles.resumeButtonText, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>
                 {resume ? 'Change Resume' : 'Upload Resume'}
               </Text>
             </TouchableOpacity>
@@ -441,6 +493,10 @@ const styles = StyleSheet.create({
   socialSection: {
     marginTop: 20,
     marginBottom: 20,
+  },
+  sectionHeader: {
+    marginTop: 20,
+    marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 18,

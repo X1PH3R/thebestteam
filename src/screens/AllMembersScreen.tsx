@@ -4,6 +4,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { User } from '../types';
+import { useTheme } from '../context/ThemeContext';
 
 type RootStackParamList = {
   MemberProfile: { member: User };
@@ -17,10 +18,11 @@ const AllMembersScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<AllMembersRouteProp>();
   const { members, clubName } = route.params;
+  const { theme, isDarkMode } = useTheme();
 
   const renderMember = ({ item }: { item: User }) => (
     <TouchableOpacity
-      style={styles.memberCard}
+      style={[styles.memberCard, { backgroundColor: theme.surface }]}
       onPress={() => navigation.navigate('MemberProfile', { member: item })}
     >
       <Image
@@ -28,18 +30,20 @@ const AllMembersScreen = () => {
         style={styles.memberImage}
       />
       <View style={styles.memberInfo}>
-        <Text style={styles.memberName}>{item.displayName}</Text>
-        <Text style={styles.memberDetails}>{item.major || 'Member'} • Class of {item.year}</Text>
+        <Text style={[styles.memberName, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>{item.displayName}</Text>
+        <Text style={[styles.memberDetails, { color: isDarkMode ? '#E0E0E0' : theme.textSecondary }]}>
+          {item.major || 'Member'} • Class of {item.year}
+        </Text>
       </View>
-      <Ionicons name="chevron-forward" size={24} color="#666" />
+      <Ionicons name="chevron-forward" size={24} color={isDarkMode ? '#E0E0E0' : theme.textSecondary} />
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{clubName} Members</Text>
-        <Text style={styles.subtitle}>{members.length} members</Text>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <View style={[styles.header, { borderBottomColor: theme.border }]}>
+        <Text style={[styles.title, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>{clubName} Members</Text>
+        <Text style={[styles.subtitle, { color: isDarkMode ? '#E0E0E0' : theme.textSecondary }]}>{members.length} members</Text>
       </View>
       <FlatList
         data={members}
@@ -54,47 +58,34 @@ const AllMembersScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   header: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#000',
+    marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
-    marginTop: 4,
   },
   listContent: {
-    padding: 16,
+    padding: 20,
   },
   memberCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
+    padding: 12,
     borderRadius: 12,
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   memberImage: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    marginRight: 16,
+    marginRight: 12,
   },
   memberInfo: {
     flex: 1,
@@ -102,12 +93,10 @@ const styles = StyleSheet.create({
   memberName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
     marginBottom: 4,
   },
   memberDetails: {
     fontSize: 14,
-    color: '#666',
   },
 });
 

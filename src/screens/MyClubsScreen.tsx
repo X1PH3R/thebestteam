@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, Alert } from
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useJoinedClubs } from '../context/JoinedClubsContext';
+import { useTheme } from '../context/ThemeContext';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { Club } from '../types';
 
@@ -17,6 +18,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 const MyClubsScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const { joinedClubs } = useJoinedClubs();
+  const { theme } = useTheme();
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -36,15 +38,15 @@ const MyClubsScreen = () => {
           }}
           style={styles.chatButton}
         >
-          <Ionicons name="chatbubbles-outline" size={24} color="#fff" />
+          <Ionicons name="chatbubbles-outline" size={24} color={theme.text} />
         </TouchableOpacity>
       ),
     });
-  }, [navigation, joinedClubs]);
+  }, [navigation, joinedClubs, theme]);
 
   const renderClubCard = ({ item }: { item: Club }) => (
     <TouchableOpacity
-      style={styles.clubCard}
+      style={[styles.clubCard, { backgroundColor: theme.background }]}
       onPress={() => navigation.navigate('ClubDetails', { club: item })}
     >
       {item.image && (
@@ -54,9 +56,9 @@ const MyClubsScreen = () => {
         />
       )}
       <View style={styles.clubInfo}>
-        <Text style={styles.clubName}>{item.name}</Text>
-        <Text style={styles.memberCount}>{item.members.length} members</Text>
-        <Text style={styles.clubDescription} numberOfLines={2}>
+        <Text style={[styles.clubName, { color: theme.text }]}>{item.name}</Text>
+        <Text style={[styles.memberCount, { color: theme.textSecondary }]}>{item.members.length} members</Text>
+        <Text style={[styles.clubDescription, { color: theme.textSecondary }]} numberOfLines={2}>
           {item.description}
         </Text>
       </View>
@@ -65,12 +67,12 @@ const MyClubsScreen = () => {
 
   if (!joinedClubs || joinedClubs.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
-        <Ionicons name="people-outline" size={80} color="#FF3B30" />
-        <Text style={styles.emptyTitle}>No Clubs Yet</Text>
-        <Text style={styles.emptyText}>Join clubs to see them here</Text>
+      <View style={[styles.emptyContainer, { backgroundColor: theme.background }]}>
+        <Ionicons name="people-outline" size={80} color={theme.primary} />
+        <Text style={[styles.emptyTitle, { color: theme.text }]}>No Clubs Yet</Text>
+        <Text style={[styles.emptyText, { color: theme.textSecondary }]}>Join clubs to see them here</Text>
         <TouchableOpacity 
-          style={styles.exploreButton}
+          style={[styles.exploreButton, { backgroundColor: theme.primary }]}
           onPress={() => navigation.navigate('Home')}
         >
           <Text style={styles.exploreButtonText}>Explore Clubs</Text>
@@ -80,7 +82,7 @@ const MyClubsScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <FlatList
         data={joinedClubs}
         keyExtractor={(item) => item.id}
@@ -94,13 +96,11 @@ const MyClubsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   listContent: {
     padding: 16,
   },
   clubCard: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     marginBottom: 16,
     shadowColor: '#000',
@@ -128,12 +128,10 @@ const styles = StyleSheet.create({
   },
   memberCount: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 8,
   },
   clubDescription: {
     fontSize: 14,
-    color: '#666',
     lineHeight: 20,
   },
   emptyContainer: {
@@ -141,7 +139,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
   },
   emptyTitle: {
     fontSize: 24,
@@ -151,12 +148,10 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
     textAlign: 'center',
     marginBottom: 30,
   },
   exploreButton: {
-    backgroundColor: '#FF3B30',
     paddingHorizontal: 30,
     paddingVertical: 15,
     borderRadius: 25,

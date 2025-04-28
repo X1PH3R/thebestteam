@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useTheme } from '../context/ThemeContext';
 import type { Club, User, Event } from '../types';
 
 type RootStackParamList = {
@@ -157,6 +158,7 @@ export { CLUBS };
 
 const ExploreScreen = () => {
   const navigation = useNavigation<NavigationProp>();
+  const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const searchInputRef = useRef<TextInput>(null);
@@ -193,17 +195,18 @@ const ExploreScreen = () => {
   });
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Explore Clubs</Text>
-        <Text style={styles.subtitle}>Find your next adventure</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Explore Clubs</Text>
+        <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Find your next adventure</Text>
       </View>
 
-      <View style={styles.searchContainer}>
+      <View style={[styles.searchContainer, { backgroundColor: theme.surface }]}>
         <TextInput
           ref={searchInputRef}
-          style={styles.searchInput}
+          style={[styles.searchInput, { color: theme.text }]}
           placeholder="Search clubs..."
+          placeholderTextColor={theme.textSecondary}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -219,13 +222,15 @@ const ExploreScreen = () => {
             key={category}
             style={[
               styles.categoryButton,
-              selectedCategory === category && styles.categoryButtonActive
+              { backgroundColor: theme.surface },
+              selectedCategory === category && { backgroundColor: theme.primary }
             ]}
             onPress={() => setSelectedCategory(category)}
           >
             <Text style={[
               styles.categoryButtonText,
-              selectedCategory === category && styles.categoryButtonTextActive
+              { color: theme.text },
+              selectedCategory === category && { color: '#fff' }
             ]}>
               {category}
             </Text>
@@ -237,32 +242,25 @@ const ExploreScreen = () => {
         {filteredClubs.map((club) => (
           <TouchableOpacity
             key={club.id}
-            style={styles.clubCard}
-            onPress={() => {
-              console.log('Attempting to navigate...');
-              console.log('Navigation object:', navigation);
-              console.log('Club data:', club);
-              try {
-                navigation.navigate('ClubDetails', { club });
-                console.log('Navigation called successfully');
-              } catch (error) {
-                console.error('Navigation error:', error);
-              }
-            }}
+            style={[styles.clubCard, { backgroundColor: theme.surface }]}
+            onPress={() => navigation.navigate('ClubDetails', { club })}
           >
-            <Image
-              source={{ uri: club.image }}
-              style={styles.clubImage}
-            />
+            {club.image && (
+              <Image
+                source={{ uri: club.image }}
+                style={styles.clubImage}
+              />
+            )}
             <View style={styles.clubInfo}>
-              <Text style={styles.clubName}>{club.name}</Text>
-              <View style={styles.clubMeta}>
-                <Text style={styles.clubCategory}>{getClubCategory(club)}</Text>
-                <Text style={styles.clubMembers}>{club.members.length} members</Text>
-              </View>
-              <Text style={styles.clubDescription} numberOfLines={2}>
+              <Text style={[styles.clubName, { color: theme.text }]}>{club.name}</Text>
+              <Text style={[styles.clubDescription, { color: theme.textSecondary }]} numberOfLines={2}>
                 {club.description}
               </Text>
+              <View style={styles.clubStats}>
+                <Text style={[styles.memberCount, { color: theme.textSecondary }]}>
+                  {club.members.length} members
+                </Text>
+              </View>
             </View>
           </TouchableOpacity>
         ))}
@@ -274,117 +272,81 @@ const ExploreScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   header: {
     padding: 20,
-    backgroundColor: '#FF3B30',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 5,
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.9)',
   },
   searchContainer: {
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    margin: 16,
   },
   searchInput: {
-    backgroundColor: '#f8f8f8',
-    borderRadius: 10,
-    padding: 15,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 59, 48, 0.2)', // Light red border
+    padding: 8,
   },
   categoriesContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
+    paddingHorizontal: 16,
+    marginBottom: 16,
   },
   categoryButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     borderRadius: 20,
-    backgroundColor: '#f8f8f8',
     marginRight: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 59, 48, 0.2)', // Light red border
-  },
-  categoryButtonActive: {
-    backgroundColor: '#FF3B30',
-    borderColor: '#FF3B30',
   },
   categoryButtonText: {
-    color: '#FF3B30',
     fontSize: 14,
-    fontWeight: '500',
-  },
-  categoryButtonTextActive: {
-    color: '#fff',
     fontWeight: '600',
   },
   clubList: {
-    padding: 20,
+    padding: 16,
   },
   clubCard: {
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    marginBottom: 20,
-    shadowColor: '#FF3B30',
+    borderRadius: 12,
+    marginBottom: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 59, 48, 0.1)', // Very light red border
   },
   clubImage: {
     width: '100%',
-    height: 200,
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+    height: 150,
+    resizeMode: 'cover',
   },
   clubInfo: {
-    padding: 15,
+    padding: 16,
   },
   clubName: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#FF3B30',
-    marginBottom: 5,
-  },
-  clubMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    fontWeight: 'bold',
     marginBottom: 8,
-  },
-  clubCategory: {
-    fontSize: 14,
-    color: '#FF3B30',
-    backgroundColor: 'rgba(255, 59, 48, 0.1)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginRight: 10,
-    fontWeight: '500',
-  },
-  clubMembers: {
-    fontSize: 14,
-    color: '#FF3B30',
-    fontWeight: '500',
   },
   clubDescription: {
     fontSize: 14,
-    color: '#333',
     lineHeight: 20,
+    marginBottom: 8,
+  },
+  clubStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  memberCount: {
+    fontSize: 14,
   },
 });
 

@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
 import { useJoinedClubs } from '../context/JoinedClubsContext';
+import { useTheme } from '../context/ThemeContext';
 import { RootStackParamList } from '../types';
 import { Club } from '../types';
 
@@ -23,6 +24,7 @@ const ProfileScreen = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const { user } = useAuth();
   const { joinedClubs } = useJoinedClubs();
+  const { theme, isDarkMode, toggleTheme } = useTheme();
   const [userClubs, setUserClubs] = useState<Club[]>([]);
 
   useEffect(() => {
@@ -30,6 +32,23 @@ const ProfileScreen = () => {
       setUserClubs(joinedClubs);
     }
   }, [joinedClubs]);
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity 
+          style={[styles.themeToggle, { backgroundColor: theme.surface }]}
+          onPress={toggleTheme}
+        >
+          <Ionicons 
+            name={isDarkMode ? "sunny" : "moon"} 
+            size={24} 
+            color={theme.text} 
+          />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, theme, isDarkMode, toggleTheme]);
 
   const handleEditProfile = () => {
     navigation.navigate('CreateProfile');
@@ -57,7 +76,7 @@ const ProfileScreen = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
         <View style={styles.profileHeader}>
           <Image
@@ -65,25 +84,26 @@ const ProfileScreen = () => {
             style={styles.profileImage}
           />
           <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
-            <Ionicons name="settings-outline" size={24} color="#FF3B30" />
+            <Ionicons name="create-outline" size={24} color={theme.primary} />
+            <Text style={[styles.editText, { color: theme.primary }]}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
         
-        <Text style={styles.displayName}>{user.displayName || 'Anonymous'}</Text>
-        <Text style={styles.bio}>{user.description || 'No bio available'}</Text>
+        <Text style={[styles.displayName, { color: theme.text }]}>{user.displayName || 'Anonymous'}</Text>
+        <Text style={[styles.bio, { color: theme.textSecondary }]}>{user.description || 'No bio available'}</Text>
         
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{userClubs.length}</Text>
-            <Text style={styles.statLabel}>Clubs</Text>
+            <Text style={[styles.statNumber, { color: theme.text }]}>{userClubs.length}</Text>
+            <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Clubs</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{user.year || 'N/A'}</Text>
-            <Text style={styles.statLabel}>Year</Text>
+            <Text style={[styles.statNumber, { color: theme.text }]}>{user.year || 'N/A'}</Text>
+            <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Year</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{user.major || 'N/A'}</Text>
-            <Text style={styles.statLabel}>Major</Text>
+            <Text style={[styles.statNumber, { color: theme.text }]}>{user.major || 'N/A'}</Text>
+            <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Major</Text>
           </View>
         </View>
 
@@ -93,7 +113,7 @@ const ProfileScreen = () => {
               style={styles.socialButton}
               onPress={() => handleSocialMediaPress(user.instagram)}
             >
-              <Ionicons name="logo-instagram" size={24} color="#FF3B30" />
+              <Ionicons name="logo-instagram" size={24} color={theme.primary} />
             </TouchableOpacity>
           )}
           {user.linkedin && (
@@ -101,7 +121,7 @@ const ProfileScreen = () => {
               style={styles.socialButton}
               onPress={() => handleSocialMediaPress(user.linkedin)}
             >
-              <Ionicons name="logo-linkedin" size={24} color="#FF3B30" />
+              <Ionicons name="logo-linkedin" size={24} color={theme.primary} />
             </TouchableOpacity>
           )}
           {user.twitter && (
@@ -109,31 +129,30 @@ const ProfileScreen = () => {
               style={styles.socialButton}
               onPress={() => handleSocialMediaPress(user.twitter)}
             >
-              <Ionicons name="logo-twitter" size={24} color="#FF3B30" />
+              <Ionicons name="logo-twitter" size={24} color={theme.primary} />
             </TouchableOpacity>
           )}
         </View>
       </View>
 
-      <View style={styles.clubsSection}>
-        <Text style={styles.sectionTitle}>My Clubs</Text>
-        <View style={styles.clubsGrid}>
-          {userClubs.map((club) => (
-            <TouchableOpacity
-              key={club.id}
-              style={styles.clubItem}
-              onPress={() => handleClubPress(club)}
-            >
-              <Image
-                source={club.image ? { uri: club.image } : undefined}
-                style={styles.clubImage}
-              />
-              <Text style={styles.clubName} numberOfLines={2}>
-                {club.name}
+      <View style={[styles.section, { backgroundColor: theme.surface }]}>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>My Clubs</Text>
+        {userClubs.map((club) => (
+          <TouchableOpacity
+            key={club.id}
+            style={styles.clubItem}
+            onPress={() => handleClubPress(club)}
+          >
+            <Image source={{ uri: club.image }} style={styles.clubImage} />
+            <View style={styles.clubInfo}>
+              <Text style={[styles.clubName, { color: theme.text }]}>{club.name}</Text>
+              <Text style={[styles.clubDescription, { color: theme.textSecondary }]}>
+                {club.description}
               </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color={theme.textSecondary} />
+          </TouchableOpacity>
+        ))}
       </View>
     </ScrollView>
   );
@@ -142,31 +161,34 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   header: {
     padding: 20,
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
   },
   profileHeader: {
-    width: '100%',
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
     marginBottom: 20,
   },
   profileImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
+    marginRight: 20,
   },
   editButton: {
     position: 'absolute',
     right: 0,
-    top: 0,
-    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+  },
+  editText: {
+    fontSize: 14,
+    marginLeft: 4,
   },
   displayName: {
     fontSize: 24,
@@ -175,7 +197,6 @@ const styles = StyleSheet.create({
   },
   bio: {
     fontSize: 16,
-    color: '#666',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -189,47 +210,61 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statNumber: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   statLabel: {
     fontSize: 14,
-    color: '#666',
   },
   socialLinks: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 20,
+    marginBottom: 20,
   },
   socialButton: {
-    padding: 10,
+    marginHorizontal: 10,
   },
-  clubsSection: {
+  section: {
+    marginTop: 20,
     padding: 20,
+    borderRadius: 10,
+    marginHorizontal: 20,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 15,
   },
-  clubsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
   clubItem: {
-    width: (Dimensions.get('window').width - 60) / 3,
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 15,
   },
   clubImage: {
-    width: '100%',
-    height: (Dimensions.get('window').width - 60) / 3,
-    borderRadius: 5,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
+  },
+  clubInfo: {
+    flex: 1,
   },
   clubName: {
-    fontSize: 12,
-    marginTop: 5,
-    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  clubDescription: {
+    fontSize: 14,
+  },
+  themeToggle: {
+    marginRight: 15,
+    padding: 8,
+    borderRadius: 20,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });
 

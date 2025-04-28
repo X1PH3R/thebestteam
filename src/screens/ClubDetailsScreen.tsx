@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useJoinedClubs } from '../context/JoinedClubsContext';
+import { useTheme } from '../context/ThemeContext';
 import type { Club, User } from '../types';
 
 type RootStackParamList = {
@@ -14,6 +15,7 @@ type RootStackParamList = {
   MyClubs: { joinedClub?: Club };
   MemberProfile: { member: User };
   AllMembers: { members: User[]; clubName: string };
+  GroupChat: { clubId: string; clubName: string };
 };
 
 type TabParamList = {
@@ -22,7 +24,7 @@ type TabParamList = {
   Profile: undefined;
 };
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList> & BottomTabNavigationProp<TabParamList>;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 type ClubDetailsRouteProp = RouteProp<RootStackParamList, 'ClubDetails'>;
 
 interface Meeting {
@@ -44,7 +46,6 @@ const sampleMembers: User[] = [
     id: '1',
     email: 'john.doe@example.com',
     displayName: 'John Doe',
-    uid: '1',
     photoURL: 'https://via.placeholder.com/50',
     major: 'Computer Science',
     year: '2024'
@@ -53,7 +54,6 @@ const sampleMembers: User[] = [
     id: '2',
     email: 'jane.smith@example.com',
     displayName: 'Jane Smith',
-    uid: '2',
     photoURL: 'https://via.placeholder.com/50',
     major: 'Business',
     year: '2025'
@@ -62,7 +62,6 @@ const sampleMembers: User[] = [
     id: '3',
     email: 'mike.johnson@example.com',
     displayName: 'Mike Johnson',
-    uid: '3',
     photoURL: 'https://via.placeholder.com/50',
     major: 'Engineering',
     year: '2023'
@@ -71,7 +70,6 @@ const sampleMembers: User[] = [
     id: '4',
     email: 'sarah.wilson@example.com',
     displayName: 'Sarah Wilson',
-    uid: '4',
     photoURL: 'https://via.placeholder.com/50',
     major: 'Psychology',
     year: '2024'
@@ -83,6 +81,7 @@ const ClubDetailsScreen = () => {
   const route = useRoute<ClubDetailsRouteProp>();
   const { club } = route.params;
   const { joinClub, leaveClub, joinedClubs } = useJoinedClubs();
+  const { theme } = useTheme();
   const isJoined = joinedClubs.some(c => c.id === club.id);
   const [imageError, setImageError] = useState(false);
   const members = club.members && Array.isArray(club.members) && club.members.length > 0 ? club.members : sampleMembers;
@@ -128,7 +127,7 @@ const ClubDetailsScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Header Image */}
       <View style={styles.headerImageContainer}>
         {club.image && !imageError ? (
@@ -138,8 +137,8 @@ const ClubDetailsScreen = () => {
             onError={() => setImageError(true)}
           />
         ) : (
-          <View style={[styles.headerImage, { backgroundColor: '#eee', alignItems: 'center', justifyContent: 'center' }]}> 
-            <Ionicons name="image-outline" size={64} color="#bbb" />
+          <View style={[styles.headerImage, { backgroundColor: theme.surface, alignItems: 'center', justifyContent: 'center' }]}> 
+            <Ionicons name="image-outline" size={64} color={theme.textSecondary} />
           </View>
         )}
         <TouchableOpacity 
@@ -152,32 +151,34 @@ const ClubDetailsScreen = () => {
 
       {/* Club Info */}
       <View style={styles.content}>
-        <Text style={styles.clubName}>{club.name}</Text>
-        <Text style={styles.clubLocation}>{club.location.name}</Text>
+        <Text style={[styles.clubName, { color: theme.text }]}>{club.name}</Text>
+        {club.location && (
+          <Text style={[styles.clubLocation, { color: theme.textSecondary }]}>{club.location.name}</Text>
+        )}
         
         <View style={styles.memberCountContainer}>
-          <Ionicons name="people-outline" size={16} color="#666" />
-          <Text style={styles.memberCount}>{club.members.length} members</Text>
+          <Ionicons name="people-outline" size={16} color={theme.textSecondary} />
+          <Text style={[styles.memberCount, { color: theme.textSecondary }]}>{club.members.length} members</Text>
         </View>
 
-        <Text style={styles.description}>{club.description}</Text>
+        <Text style={[styles.description, { color: theme.text }]}>{club.description}</Text>
 
-        <View style={styles.membersContainer}>
+        <View style={[styles.membersContainer, { backgroundColor: theme.surface }]}>
           <View style={styles.memberHeader}>
-            <Text style={styles.sectionTitle}>Club Members</Text>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>Club Members</Text>
             <TouchableOpacity 
               style={styles.viewAllButton}
               onPress={handleViewAllMembers}
             >
-              <Text style={styles.viewAllText}>View All</Text>
-              <Ionicons name="chevron-forward" size={16} color="#FF3B30" />
+              <Text style={[styles.viewAllText, { color: theme.primary }]}>View All</Text>
+              <Ionicons name="chevron-forward" size={16} color={theme.primary} />
             </TouchableOpacity>
           </View>
           <View style={styles.membersList}>
             {members.slice(0, 3).map((member) => (
               <TouchableOpacity 
                 key={member.id} 
-                style={styles.memberCard}
+                style={[styles.memberCard, { backgroundColor: theme.background }]}
                 onPress={() => navigation.navigate('MemberProfile', { member })}
               >
                 <Image
@@ -185,10 +186,10 @@ const ClubDetailsScreen = () => {
                   style={styles.memberImage}
                 />
                 <View style={styles.memberInfo}>
-                  <Text style={styles.memberName}>{member.displayName}</Text>
-                  <Text style={styles.memberRole}>{member.major || 'Member'}</Text>
+                  <Text style={[styles.memberName, { color: theme.text }]}>{member.displayName}</Text>
+                  <Text style={[styles.memberRole, { color: theme.textSecondary }]}>{member.major || 'Member'}</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={24} color="#666" />
+                <Ionicons name="chevron-forward" size={24} color={theme.textSecondary} />
               </TouchableOpacity>
             ))}
           </View>
@@ -197,14 +198,14 @@ const ClubDetailsScreen = () => {
         {/* Join/Leave Button */}
         {isJoined ? (
           <TouchableOpacity 
-            style={styles.leaveButton}
+            style={[styles.leaveButton, { backgroundColor: theme.error }]}
             onPress={handleLeaveClub}
           >
             <Text style={styles.leaveButtonText}>Leave Club</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity 
-            style={styles.joinButton}
+            style={[styles.joinButton, { backgroundColor: theme.primary }]}
             onPress={handleJoinClub}
           >
             <Text style={styles.joinButtonText}>Join Club</Text>
@@ -213,11 +214,11 @@ const ClubDetailsScreen = () => {
 
         {/* Calendar Button */}
         <TouchableOpacity 
-          style={styles.calendarButton}
+          style={[styles.calendarButton, { borderColor: theme.primary }]}
           onPress={handleAddToCalendar}
         >
-          <Ionicons name="calendar-outline" size={20} color="#FF3B30" />
-          <Text style={styles.calendarButtonText}>Add to Calendar</Text>
+          <Ionicons name="calendar-outline" size={20} color={theme.primary} />
+          <Text style={[styles.calendarButtonText, { color: theme.primary }]}>Add to Calendar</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -227,7 +228,6 @@ const ClubDetailsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   headerImageContainer: {
     height: 250,

@@ -6,7 +6,7 @@
  */
 
 import React, { useCallback } from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -17,6 +17,7 @@ import * as Linking from 'expo-linking';
 import { Ionicons } from '@expo/vector-icons';
 import { JoinedClubsProvider } from './src/context/JoinedClubsContext';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
+import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 
 import ExploreScreen from './src/screens/ClubScreen';
 import EventScreen from './src/screens/EventScreen';
@@ -31,6 +32,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import AllMembersScreen from './src/screens/AllMembersScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import AnnouncementsScreen from './src/screens/AnnouncementsScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -49,6 +51,8 @@ type RootStackParamList = {
   GroupChat: { clubId: string; clubName: string };
   AllMembers: { members: any[]; clubName: string };
   Profile: undefined;
+  Settings: undefined;
+  Main: undefined;
 };
 
 type TabParamList = {
@@ -78,137 +82,145 @@ const linking = {
   },
 };
 
-const HomeStack = () => (
-  <Stack.Navigator
-    screenOptions={{
-      headerStyle: {
-        backgroundColor: '#FF3B30',
-      },
-      headerTintColor: '#fff',
-      headerTitleStyle: {
-        fontWeight: 'bold',
-      },
-    }}
-  >
-    <Stack.Screen 
-      name="MyClubs" 
-      component={MyClubsScreen}
-      options={{
-        title: 'My Clubs',
+const HomeStack = () => {
+  const { theme } = useTheme();
+  
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: theme.primary,
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
       }}
-    />
-    <Stack.Screen 
-      name="ClubDetails" 
-      component={ClubDetailsScreen}
-      options={{
-        headerShown: false,
-      }}
-    />
-    <Stack.Screen 
-      name="Events" 
-      component={EventScreen}
-      options={{
-        title: 'Events',
-      }}
-    />
-    <Stack.Screen 
-      name="MemberProfile" 
-      component={MemberProfileScreen}
-      options={{
-        headerShown: false,
-      }}
-    />
-    <Stack.Screen 
-      name="CreateProfile" 
-      component={CreateProfileScreen}
-      options={{
-        headerShown: false,
-      }}
-    />
-    <Stack.Screen 
-      name="AllMembers" 
-      component={AllMembersScreen}
-      options={{
-        title: 'Members',
-        headerShown: true,
-      }}
-    />
-    <Stack.Screen 
-      name="GroupChat" 
-      component={GroupChatScreen}
-      options={{
-        title: 'Group Chat',
-        headerShown: true,
-      }}
-    />
-  </Stack.Navigator>
-);
+    >
+      <Stack.Screen 
+        name="MyClubs" 
+        component={MyClubsScreen}
+        options={{
+          title: 'My Clubs',
+        }}
+      />
+      <Stack.Screen 
+        name="ClubDetails" 
+        component={ClubDetailsScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen 
+        name="Events" 
+        component={EventScreen}
+        options={{
+          title: 'Events',
+        }}
+      />
+      <Stack.Screen 
+        name="MemberProfile" 
+        component={MemberProfileScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen 
+        name="CreateProfile" 
+        component={CreateProfileScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen 
+        name="AllMembers" 
+        component={AllMembersScreen}
+        options={{
+          title: 'Members',
+          headerShown: true,
+        }}
+      />
+      <Stack.Screen 
+        name="GroupChat" 
+        component={GroupChatScreen}
+        options={{
+          title: 'Group Chat',
+          headerShown: true,
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
 
-const ExploreStack = () => (
-  <Stack.Navigator
-    screenOptions={{
-      headerStyle: {
-        backgroundColor: '#FF3B30',
-      },
-      headerTintColor: '#fff',
-      headerTitleStyle: {
-        fontWeight: 'bold',
-      },
-    }}
-  >
-    <Stack.Screen 
-      name="ExploreClubs" 
-      component={ExploreScreen}
-      options={{
-        title: 'Explore Clubs',
+const ExploreStack = () => {
+  const { theme } = useTheme();
+  
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: theme.primary,
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
       }}
-    />
-    <Stack.Screen 
-      name="ClubDetails" 
-      component={ClubDetailsScreen}
-      options={{
-        headerShown: false,
-      }}
-    />
-    <Stack.Screen 
-      name="Events" 
-      component={EventScreen}
-      options={{
-        title: 'Events',
-      }}
-    />
-    <Stack.Screen 
-      name="MemberProfile" 
-      component={MemberProfileScreen}
-      options={{
-        headerShown: false,
-      }}
-    />
-    <Stack.Screen 
-      name="CreateProfile" 
-      component={CreateProfileScreen}
-      options={{
-        headerShown: false,
-      }}
-    />
-    <Stack.Screen 
-      name="AllMembers" 
-      component={AllMembersScreen}
-      options={{
-        title: 'Members',
-        headerShown: true,
-      }}
-    />
-    <Stack.Screen 
-      name="GroupChat" 
-      component={GroupChatScreen}
-      options={{
-        title: 'Group Chat',
-        headerShown: true,
-      }}
-    />
-  </Stack.Navigator>
-);
+    >
+      <Stack.Screen 
+        name="ExploreClubs" 
+        component={ExploreScreen}
+        options={{
+          title: 'Explore Clubs',
+        }}
+      />
+      <Stack.Screen 
+        name="ClubDetails" 
+        component={ClubDetailsScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen 
+        name="Events" 
+        component={EventScreen}
+        options={{
+          title: 'Events',
+        }}
+      />
+      <Stack.Screen 
+        name="MemberProfile" 
+        component={MemberProfileScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen 
+        name="CreateProfile" 
+        component={CreateProfileScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen 
+        name="AllMembers" 
+        component={AllMembersScreen}
+        options={{
+          title: 'Members',
+          headerShown: true,
+        }}
+      />
+      <Stack.Screen 
+        name="GroupChat" 
+        component={GroupChatScreen}
+        options={{
+          title: 'Group Chat',
+          headerShown: true,
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
 
 const AuthStack = () => (
   <Stack.Navigator
@@ -222,44 +234,64 @@ const AuthStack = () => (
   </Stack.Navigator>
 );
 
-const ProfileStack = () => (
-  <Stack.Navigator
-    screenOptions={{
-      headerStyle: {
-        backgroundColor: '#FF3B30',
-      },
-      headerTintColor: '#fff',
-      headerTitleStyle: {
-        fontWeight: 'bold',
-      },
-    }}
-  >
-    <Stack.Screen 
-      name="Profile" 
-      component={ProfileScreen}
-      options={{
-        headerShown: false
+const ProfileStack = () => {
+  const { theme } = useTheme();
+  
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: theme.primary,
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
       }}
-    />
-    <Stack.Screen 
-      name="CreateProfile" 
-      component={CreateProfileScreen}
-      options={{
-        title: 'Edit Profile',
-        headerShown: true,
-      }}
-    />
-    <Stack.Screen 
-      name="ClubDetails" 
-      component={ClubDetailsScreen}
-      options={{
-        headerShown: false,
-      }}
-    />
-  </Stack.Navigator>
-);
+    >
+      <Stack.Screen 
+        name="Profile" 
+        component={ProfileScreen}
+        options={({ navigation }) => ({
+          title: 'Profile',
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Settings')}
+              style={{ marginRight: 15 }}
+            >
+              <Ionicons name="settings-outline" size={24} color="#fff" />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <Stack.Screen 
+        name="Settings" 
+        component={SettingsScreen}
+        options={{
+          title: 'Settings',
+        }}
+      />
+      <Stack.Screen 
+        name="CreateProfile" 
+        component={CreateProfileScreen}
+        options={{
+          title: 'Edit Profile',
+          headerShown: true,
+        }}
+      />
+      <Stack.Screen 
+        name="ClubDetails" 
+        component={ClubDetailsScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
 
 const MainApp = () => {
+  const { theme } = useTheme();
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
@@ -294,10 +326,10 @@ const MainApp = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#FF3B30',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.textSecondary,
         headerStyle: {
-          backgroundColor: '#FF3B30',
+          backgroundColor: theme.primary,
         },
         headerTintColor: '#fff',
         headerTitleStyle: {
@@ -307,17 +339,9 @@ const MainApp = () => {
           paddingBottom: 10,
           paddingTop: 10,
           height: 80,
-          backgroundColor: '#fff',
+          backgroundColor: theme.background,
           borderTopWidth: 1,
-          borderTopColor: '#f0f0f0',
-          elevation: 8,
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 0,
-            height: -2,
-          },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
+          borderTopColor: theme.border,
         },
         tabBarLabelStyle: {
           fontSize: 14,
@@ -338,6 +362,7 @@ const MainApp = () => {
         name="Clubs" 
         component={HomeStack}
         options={{
+          title: 'My Clubs',
           headerShown: false
         }}
       />
@@ -382,26 +407,68 @@ const MainApp = () => {
   );
 };
 
-export default function App() {
-  const onLayoutRootView = useCallback(async () => {
-    await SplashScreen.hideAsync();
+const App = () => {
+  const [appIsReady, setAppIsReady] = React.useState(false);
+
+  React.useEffect(() => {
+    async function prepare() {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        setAppIsReady(true);
+      }
+    }
+
+    prepare();
   }, []);
 
+  const onLayoutRootView = useCallback(async () => {
+    if (appIsReady) {
+      await SplashScreen.hideAsync();
+    }
+  }, [appIsReady]);
+
+  if (!appIsReady) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#FF3B30" />
+      </View>
+    );
+  }
+
   return (
-    <AuthProvider>
-      <JoinedClubsProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <View style={styles.container} onLayout={onLayoutRootView}>
-            <StatusBar style="light" />
+    <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+      <ThemeProvider>
+        <AuthProvider>
+          <JoinedClubsProvider>
             <NavigationContainer linking={linking}>
-              <MainApp />
+              <StatusBar style="auto" />
+              <Stack.Navigator>
+                <Stack.Screen 
+                  name="Main" 
+                  component={MainApp}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen 
+                  name="AllMembers" 
+                  component={AllMembersScreen}
+                  options={{
+                    title: 'Members',
+                    headerShown: true,
+                  }}
+                />
+              </Stack.Navigator>
             </NavigationContainer>
-          </View>
-        </GestureHandlerRootView>
-      </JoinedClubsProvider>
-    </AuthProvider>
+          </JoinedClubsProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
-}
+};
+
+export default App;
 
 const styles = StyleSheet.create({
   container: {

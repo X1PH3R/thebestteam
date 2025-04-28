@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { useJoinedClubs } from '../context/JoinedClubsContext';
+import { useTheme } from '../context/ThemeContext';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 type RootStackParamList = {
@@ -14,16 +15,17 @@ type HomeScreenProps = {
 
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const { joinedClubs } = useJoinedClubs();
+  const { theme } = useTheme();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>My Clubs</Text>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <Text style={[styles.title, { color: theme.text }]}>My Clubs</Text>
       <FlatList
         data={joinedClubs}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.clubItem}>
-            <Text style={styles.clubName}>{item.name}</Text>
+          <View style={[styles.clubItem, { borderBottomColor: theme.border }]}>
+            <Text style={[styles.clubName, { color: theme.text }]}>{item.name}</Text>
           </View>
         )}
       />
@@ -35,7 +37,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
   },
   title: {
     fontSize: 24,
@@ -45,7 +46,6 @@ const styles = StyleSheet.create({
   clubItem: {
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
   },
   clubName: {
     fontSize: 18,

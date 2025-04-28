@@ -9,10 +9,11 @@ export type RootStackParamList = {
   ClubDetails: { club: Club };
   GroupChat: { club: Club };
   MemberProfile: { member: User };
-  AllMembers: { club: Club };
+  AllMembers: { members: User[]; clubName: string };
   CreateProfile: undefined;
   Login: undefined;
   ForgotPassword: undefined;
+  Settings: undefined;
 };
 
 export type NavigationProp = NativeStackNavigationProp<RootStackParamList>;

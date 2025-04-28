@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Share, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useJoinedClubs } from '../context/JoinedClubsContext';
+import { useTheme } from '../context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types';
@@ -58,6 +59,7 @@ const mockAnnouncements = [
 const AnnouncementsScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { joinedClubs } = useJoinedClubs();
+  const { theme } = useTheme();
   const [announcements, setAnnouncements] = useState(mockAnnouncements.map(announcement => ({
     ...announcement,
     isLiked: false
@@ -114,17 +116,17 @@ const AnnouncementsScreen = () => {
 
   if (!joinedClubs || joinedClubs.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
+      <View style={[styles.emptyContainer, { backgroundColor: theme.background }]}>
         <LinearGradient
-          colors={['#FF3B30', '#FF6B6B']}
+          colors={[theme.primary, '#FF6B6B']}
           style={styles.emptyIconContainer}
         >
           <Ionicons name="megaphone-outline" size={80} color="#fff" />
         </LinearGradient>
-        <Text style={styles.emptyTitle}>No Clubs Joined</Text>
-        <Text style={styles.emptyText}>Join clubs to see their announcements and stay updated with the latest news!</Text>
+        <Text style={[styles.emptyTitle, { color: theme.text }]}>No Clubs Joined</Text>
+        <Text style={[styles.emptyText, { color: theme.textSecondary }]}>Join clubs to see their announcements and stay updated with the latest news!</Text>
         <TouchableOpacity
-          style={styles.exploreButton}
+          style={[styles.exploreButton, { backgroundColor: theme.primary }]}
           onPress={() => navigation.navigate('Home')}
         >
           <Text style={styles.exploreButtonText}>Explore Clubs</Text>
@@ -141,17 +143,17 @@ const AnnouncementsScreen = () => {
 
   if (filteredAnnouncements.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
+      <View style={[styles.emptyContainer, { backgroundColor: theme.background }]}>
         <LinearGradient
-          colors={['#FF3B30', '#FF6B6B']}
+          colors={[theme.primary, '#FF6B6B']}
           style={styles.emptyIconContainer}
         >
           <Ionicons name="megaphone-outline" size={80} color="#fff" />
         </LinearGradient>
-        <Text style={styles.emptyTitle}>No Announcements Yet</Text>
-        <Text style={styles.emptyText}>Your clubs haven't posted any announcements yet. Check back later!</Text>
+        <Text style={[styles.emptyTitle, { color: theme.text }]}>No Announcements Yet</Text>
+        <Text style={[styles.emptyText, { color: theme.textSecondary }]}>Your clubs haven't posted any announcements yet. Check back later!</Text>
         <TouchableOpacity
-          style={styles.exploreButton}
+          style={[styles.exploreButton, { backgroundColor: theme.primary }]}
           onPress={() => navigation.navigate('Home')}
         >
           <Text style={styles.exploreButtonText}>Explore More Clubs</Text>
@@ -161,71 +163,74 @@ const AnnouncementsScreen = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      {filteredAnnouncements.map((announcement) => (
-        <View key={announcement.id} style={styles.announcementCard}>
-          <LinearGradient
-            colors={['#FF3B30', '#FF6B6B']}
-            style={styles.cardHeader}
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <ScrollView>
+        {filteredAnnouncements.map((announcement) => (
+          <View 
+            key={announcement.id} 
+            style={[styles.announcementCard, { backgroundColor: theme.surface }]}
           >
-            <View style={styles.clubInfo}>
-              <Image 
-                source={{ uri: announcement.image }} 
-                style={styles.clubImage}
-              />
-              <View>
-                <Text style={styles.clubName}>{announcement.clubName}</Text>
-                <Text style={styles.date}>{announcement.date}</Text>
+            <LinearGradient
+              colors={[theme.primary, '#FF6B6B']}
+              style={styles.cardHeader}
+            >
+              <View style={styles.clubInfo}>
+                <Image 
+                  source={{ uri: announcement.image }} 
+                  style={styles.clubImage}
+                />
+                <View>
+                  <Text style={styles.clubName}>{announcement.clubName}</Text>
+                  <Text style={styles.date}>{announcement.date}</Text>
+                </View>
+              </View>
+            </LinearGradient>
+            <View style={styles.cardContent}>
+              <Text style={[styles.title, { color: theme.text }]}>{announcement.title}</Text>
+              <Text style={[styles.content, { color: theme.textSecondary }]}>{announcement.content}</Text>
+              <View style={[styles.actions, { borderTopColor: theme.border }]}>
+                <TouchableOpacity 
+                  style={styles.actionButton}
+                  onPress={() => handleLike(announcement.id)}
+                >
+                  <Ionicons 
+                    name={announcement.isLiked ? "heart" : "heart-outline"} 
+                    size={20} 
+                    color={theme.primary} 
+                  />
+                  <Text style={[styles.actionText, { color: theme.primary }]}>{announcement.likes} Likes</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.actionButton}
+                  onPress={() => handleComment(announcement.id)}
+                >
+                  <Ionicons name="chatbubble-outline" size={20} color={theme.primary} />
+                  <Text style={[styles.actionText, { color: theme.primary }]}>Comment</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.actionButton}
+                  onPress={() => handleShare(announcement)}
+                >
+                  <Ionicons name="share-outline" size={20} color={theme.primary} />
+                  <Text style={[styles.actionText, { color: theme.primary }]}>Share</Text>
+                </TouchableOpacity>
               </View>
             </View>
-          </LinearGradient>
-          <View style={styles.cardContent}>
-            <Text style={styles.title}>{announcement.title}</Text>
-            <Text style={styles.content}>{announcement.content}</Text>
-            <View style={styles.actions}>
-              <TouchableOpacity 
-                style={styles.actionButton}
-                onPress={() => handleLike(announcement.id)}
-              >
-                <Ionicons 
-                  name={announcement.isLiked ? "heart" : "heart-outline"} 
-                  size={20} 
-                  color="#FF3B30" 
-                />
-                <Text style={styles.actionText}>{announcement.likes} Likes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.actionButton}
-                onPress={() => handleComment(announcement.id)}
-              >
-                <Ionicons name="chatbubble-outline" size={20} color="#FF3B30" />
-                <Text style={styles.actionText}>Comment</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.actionButton}
-                onPress={() => handleShare(announcement)}
-              >
-                <Ionicons name="share-outline" size={20} color="#FF3B30" />
-                <Text style={styles.actionText}>Share</Text>
-              </TouchableOpacity>
-            </View>
           </View>
-        </View>
-      ))}
-    </ScrollView>
+        ))}
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
     padding: 20,
   },
   emptyIconContainer: {
@@ -239,19 +244,16 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 10,
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
     textAlign: 'center',
     marginBottom: 30,
     paddingHorizontal: 20,
     lineHeight: 24,
   },
   exploreButton: {
-    backgroundColor: '#FF3B30',
     paddingHorizontal: 30,
     paddingVertical: 15,
     borderRadius: 25,
@@ -267,7 +269,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   announcementCard: {
-    backgroundColor: '#fff',
     margin: 10,
     borderRadius: 15,
     overflow: 'hidden',
@@ -311,12 +312,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 10,
   },
   content: {
     fontSize: 15,
-    color: '#444',
     lineHeight: 22,
     marginBottom: 15,
   },
@@ -324,7 +323,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     borderTopWidth: 1,
-    borderTopColor: '#eee',
     paddingTop: 15,
   },
   actionButton: {
@@ -333,7 +331,6 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   actionText: {
-    color: '#FF3B30',
     marginLeft: 5,
     fontSize: 14,
     fontWeight: '500',

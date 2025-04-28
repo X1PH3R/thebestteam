@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Calendar } from 'react-native-calendars';
 import { useJoinedClubs } from '../context/JoinedClubsContext';
+import { useTheme } from '../context/ThemeContext';
 import { Club, Event, User } from '../types';
 
 type RootStackParamList = {
@@ -53,6 +54,7 @@ interface CalendarEvent extends Event {
 const EventScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const { joinedClubs } = useJoinedClubs();
+  const { theme, isDarkMode } = useTheme();
   const [selectedDate, setSelectedDate] = useState('');
   const [eventsForSelectedDate, setEventsForSelectedDate] = useState<CalendarEvent[]>([]);
 
@@ -102,7 +104,7 @@ const EventScreen = () => {
           markedDates[eventDateString] = {
             ...markedDates[eventDateString],
             marked: true,
-            dotColor: '#FF3B30'
+            dotColor: theme.primary
           };
         }
       });
@@ -118,7 +120,7 @@ const EventScreen = () => {
               markedDates[meetingDateString] = {
                 ...markedDates[meetingDateString],
                 marked: true,
-                dotColor: '#FF3B30'
+                dotColor: theme.primary
               };
             }
           });
@@ -154,7 +156,11 @@ const EventScreen = () => {
               title: `${club.name} Regular Meeting`,
               description: `Regular ${meeting.frequency} meeting at ${meeting.time}`,
               date: `${date}T${meeting.time}`,
-              location: club.location,
+              location: club.location || {
+                name: 'Location TBD',
+                latitude: 0,
+                longitude: 0
+              },
               attendees: [],
               clubName: club.name,
               isMeeting: true
@@ -184,104 +190,97 @@ const EventScreen = () => {
     }
   };
 
+  // Get calendar theme based on current theme
+  const getCalendarTheme = () => ({
+    backgroundColor: theme.background,
+    calendarBackground: theme.background,
+    textSectionTitleColor: isDarkMode ? '#E0E0E0' : theme.textSecondary,
+    selectedDayBackgroundColor: theme.primary,
+    selectedDayTextColor: theme.background,
+    todayTextColor: theme.primary,
+    dayTextColor: isDarkMode ? '#FFFFFF' : theme.text,
+    textDisabledColor: isDarkMode ? '#666666' : theme.textSecondary,
+    dotColor: theme.primary,
+    selectedDotColor: theme.background,
+    arrowColor: theme.primary,
+    monthTextColor: isDarkMode ? '#FFFFFF' : theme.text,
+    indicatorColor: theme.primary,
+    textDayFontWeight: '300',
+    textMonthFontWeight: 'bold',
+    textDayHeaderFontWeight: '300',
+    textDayFontSize: 16,
+    textMonthFontSize: 16,
+    textDayHeaderFontSize: 16,
+    'stylesheet.calendar.header': {
+      week: {
+        marginTop: 5,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 10,
+      },
+      dayHeader: {
+        marginTop: 2,
+        marginBottom: 7,
+        width: 32,
+        textAlign: 'center',
+        fontSize: 13,
+        fontWeight: '600',
+        color: isDarkMode ? '#E0E0E0' : theme.textSecondary,
+      },
+    },
+  });
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Club Events Calendar</Text>
-        <Text style={styles.subHeaderText}>View all your club events and meetings in one place</Text>
+        <Text style={[styles.headerText, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>Club Events Calendar</Text>
+        <Text style={[styles.subHeaderText, { color: isDarkMode ? '#E0E0E0' : theme.textSecondary }]}>View all your club events and meetings in one place</Text>
       </View>
       
+      <View style={[styles.calendarContainer, { backgroundColor: theme.surface }]}>
+        <Calendar
+          onDayPress={onDayPress}
+          markedDates={getMarkedDates()}
+          theme={getCalendarTheme()}
+          style={styles.calendar}
+        />
+      </View>
+
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#FF3B30' }]} />
-          <Text style={styles.legendText}>Club Events & Meetings</Text>
+          <View style={[styles.legendDot, { backgroundColor: theme.primary }]} />
+          <Text style={[styles.legendText, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>Events & Meetings</Text>
         </View>
       </View>
 
-      <Calendar
-        style={styles.calendar}
-        theme={{
-          calendarBackground: '#ffffff',
-          textSectionTitleColor: '#b6c1cd',
-          selectedDayBackgroundColor: '#E5E5E5',
-          selectedDayTextColor: '#000000',
-          todayTextColor: '#FF3B30',
-          dayTextColor: '#2d4150',
-          textDisabledColor: '#d9e1e8',
-          dotColor: '#FF3B30',
-          selectedDotColor: '#FF3B30',
-          arrowColor: '#FF3B30',
-          monthTextColor: '#2d4150',
-          indicatorColor: '#FF3B30',
-        }}
-        markingType="simple"
-        markedDates={getMarkedDates()}
-        onDayPress={onDayPress}
-        enableSwipeMonths={true}
-        hideExtraDays={true}
-        showWeekNumbers={false}
-        firstDay={1}
-      />
-
       {selectedDate && (
-        <View style={styles.eventList}>
-          <Text style={styles.selectedDateText}>
-            {new Date(selectedDate).toLocaleDateString('en-US', { 
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
+        <View style={[styles.eventsContainer, { backgroundColor: theme.surface }]}>
+          <Text style={[styles.eventsTitle, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>
+            Events for {new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </Text>
-
           {eventsForSelectedDate.length > 0 ? (
-            <>
-              <View style={styles.summaryTile}>
-                <Text style={styles.summaryTitle}>Club Meetings Today</Text>
-                {[...new Set(eventsForSelectedDate.map(event => event.clubName))].map((clubName, index) => (
-                  <View
-                    key={index}
-                    style={styles.clubMeetingRow}
-                  >
-                    <View style={styles.clubIndicator} />
-                    <Text style={styles.clubMeetingText}>
-                      {clubName ?? 'Unnamed Club'}
-                    </Text>
-                    <Text style={styles.meetingTime}>
-                      {eventsForSelectedDate
-                        .find(event => event.clubName === clubName)?.date
-                        ? new Date(eventsForSelectedDate.find(event => event.clubName === clubName)!.date)
-                            .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                        : ''}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-
-              {eventsForSelectedDate.map((event, index) => (
-                <View 
-                  key={index}
-                  style={[
-                    styles.eventCard,
-                    event.isMeeting && styles.meetingCard
-                  ]}
-                >
-                  <Text style={styles.eventName}>{event.title ?? 'Untitled Event'}</Text>
-                  <Text style={styles.clubName}>{event.clubName ?? 'Unnamed Club'}</Text>
-                  <Text style={styles.eventTime}>
-                    {new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            eventsForSelectedDate.map((event) => (
+              <TouchableOpacity
+                key={event.id}
+                style={[styles.eventCard, { backgroundColor: theme.background }]}
+                onPress={() => handleEventClick(event)}
+              >
+                <View style={styles.eventHeader}>
+                  <Text style={[styles.eventTitle, { color: isDarkMode ? '#FFFFFF' : theme.text }]}>{event.title}</Text>
+                  <Text style={[styles.eventTime, { color: isDarkMode ? '#E0E0E0' : theme.textSecondary }]}>
+                    {new Date(event.date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                   </Text>
-                  <Text style={styles.eventDescription}>{event.description}</Text>
-                  {event.isMeeting && (
-                    <View style={styles.meetingBadge}>
-                      <Text style={styles.meetingBadgeText}>Regular Meeting</Text>
-                    </View>
-                  )}
                 </View>
-              ))}
-            </>
+                <Text style={[styles.eventClub, { color: isDarkMode ? '#E0E0E0' : theme.textSecondary }]}>{event.clubName}</Text>
+                <Text style={[styles.eventLocation, { color: isDarkMode ? '#E0E0E0' : theme.textSecondary }]}>
+                  {event.location.name}
+                </Text>
+              </TouchableOpacity>
+            ))
           ) : (
-            <Text style={styles.noEventsText}>No events scheduled for this day</Text>
+            <Text style={[styles.noEventsText, { color: isDarkMode ? '#E0E0E0' : theme.textSecondary }]}>
+              No events scheduled for this day
+            </Text>
           )}
         </View>
       )}
@@ -292,27 +291,36 @@ const EventScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   header: {
     padding: 20,
-    backgroundColor: '#FF3B30',
+    alignItems: 'center',
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 5,
+    marginBottom: 8,
   },
   subHeaderText: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
+  },
+  calendarContainer: {
+    margin: 20,
+    borderRadius: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  calendar: {
+    borderRadius: 10,
   },
   legend: {
     flexDirection: 'row',
     justifyContent: 'center',
-    padding: 10,
-    backgroundColor: '#fff',
+    marginBottom: 20,
   },
   legendItem: {
     flexDirection: 'row',
@@ -320,145 +328,64 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 5,
-  },
-  legendText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  calendar: {
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  eventList: {
-    padding: 15,
-  },
-  selectedDateText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#2d4150',
-  },
-  clubsForDayText: {
-    fontSize: 16,
-    marginBottom: 15,
-    lineHeight: 22,
-  },
-  clubsForDayLabel: {
-    color: '#666',
-  },
-  clubsList: {
-    color: '#007AFF',
-    fontWeight: '600',
-  },
-  eventCard: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  meetingCard: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#34C759',
-  },
-  eventName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#2d4150',
-  },
-  clubName: {
-    fontSize: 16,
-    color: '#FF3B30',
-    marginBottom: 5,
-  },
-  eventTime: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 5,
-  },
-  eventDescription: {
-    fontSize: 14,
-    color: '#666',
-  },
-  noEventsText: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 20,
-  },
-  meetingBadge: {
-    position: 'absolute',
-    top: 15,
-    right: 15,
-    backgroundColor: '#28CD41',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  meetingBadgeText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  summaryTile: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  summaryTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#2d4150',
-    marginBottom: 12,
-  },
-  clubMeetingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-    borderRadius: 8,
-    backgroundColor: '#fff',
-  },
-  clubIndicator: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#28CD41',
-    marginRight: 10,
+    marginRight: 8,
   },
-  clubMeetingText: {
-    flex: 1,
-    fontSize: 16,
-    color: '#2d4150',
-    fontWeight: '500',
-  },
-  meetingTime: {
+  legendText: {
     fontSize: 14,
-    color: '#666',
-    marginLeft: 8,
+  },
+  eventsContainer: {
+    margin: 20,
+    padding: 20,
+    borderRadius: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  eventsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  eventCard: {
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+  },
+  eventHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  eventTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    flex: 1,
+  },
+  eventTime: {
+    fontSize: 14,
+  },
+  eventClub: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  eventLocation: {
+    fontSize: 14,
+  },
+  noEventsText: {
+    fontSize: 16,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
 
