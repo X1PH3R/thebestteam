@@ -7,15 +7,22 @@ import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useJoinedClubs } from '../context/JoinedClubsContext';
 import { useTheme } from '../context/ThemeContext';
 import type { Club, User } from '../types';
+import { CommonActions } from '@react-navigation/native';
 
 type RootStackParamList = {
-  Home: undefined;
-  Explore: undefined;
+  MainTabs: undefined;
+  Calendar: undefined;
+  Events: undefined;
+  Announcements: undefined;
   ClubDetails: { club: Club };
-  MyClubs: { joinedClub?: Club };
-  MemberProfile: { member: User };
-  AllMembers: { members: User[]; clubName: string };
   GroupChat: { clubId: string; clubName: string };
+  AllMembers: { members: User[]; clubName: string };
+  MemberProfile: { member: User };
+  CreateProfile: undefined;
+  Settings: undefined;
+  Profile: undefined;
+  ExploreClubs: undefined;
+  MyClubs: { joinedClub?: Club } | undefined;
 };
 
 type TabParamList = {
@@ -94,7 +101,6 @@ const ClubDetailsScreen = () => {
 
   const handleJoinClub = () => {
     joinClub(club);
-    navigation.navigate('Home');
   };
 
   const handleLeaveClub = () => {
@@ -111,7 +117,6 @@ const ClubDetailsScreen = () => {
           style: 'destructive',
           onPress: () => {
             leaveClub(club.id);
-            navigation.navigate('Home');
           },
         },
       ],

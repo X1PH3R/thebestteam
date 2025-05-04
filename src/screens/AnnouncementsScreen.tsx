@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types';
 import { LinearGradient } from 'expo-linear-gradient';
+import { CommonActions } from '@react-navigation/native';
 
 // Mock announcements data with images
 const mockAnnouncements = [
@@ -114,6 +115,14 @@ const AnnouncementsScreen = () => {
     }
   };
 
+  const handleExplorePress = () => {
+    navigation.dispatch(
+      CommonActions.navigate({
+        name: 'ExploreClubs'
+      })
+    );
+  };
+
   if (!joinedClubs || joinedClubs.length === 0) {
     return (
       <View style={[styles.emptyContainer, { backgroundColor: theme.background }]}>
@@ -127,7 +136,7 @@ const AnnouncementsScreen = () => {
         <Text style={[styles.emptyText, { color: theme.textSecondary }]}>Join clubs to see their announcements and stay updated with the latest news!</Text>
         <TouchableOpacity
           style={[styles.exploreButton, { backgroundColor: theme.primary }]}
-          onPress={() => navigation.navigate('Home')}
+          onPress={handleExplorePress}
         >
           <Text style={styles.exploreButtonText}>Explore Clubs</Text>
         </TouchableOpacity>
@@ -154,7 +163,7 @@ const AnnouncementsScreen = () => {
         <Text style={[styles.emptyText, { color: theme.textSecondary }]}>Your clubs haven't posted any announcements yet. Check back later!</Text>
         <TouchableOpacity
           style={[styles.exploreButton, { backgroundColor: theme.primary }]}
-          onPress={() => navigation.navigate('Home')}
+          onPress={handleExplorePress}
         >
           <Text style={styles.exploreButtonText}>Explore More Clubs</Text>
         </TouchableOpacity>

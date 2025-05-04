@@ -11,6 +11,7 @@ type RootStackParamList = {
   Home: undefined;
   GroupChat: { clubId: string; clubName: string };
   ClubDetails: { club: Club };
+  ExploreClubs: undefined;
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -73,7 +74,7 @@ const MyClubsScreen = () => {
         <Text style={[styles.emptyText, { color: theme.textSecondary }]}>Join clubs to see them here</Text>
         <TouchableOpacity 
           style={[styles.exploreButton, { backgroundColor: theme.primary }]}
-          onPress={() => navigation.navigate('Home')}
+          onPress={() => navigation.navigate('ExploreClubs')}
         >
           <Text style={styles.exploreButtonText}>Explore Clubs</Text>
         </TouchableOpacity>
