@@ -8,6 +8,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, CommonActions, useIsFocused } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useJoinedClubs } from '../context/JoinedClubsContext';
 
 type RootStackParamList = {
   MainTabs: undefined;
@@ -23,19 +24,22 @@ type RootStackParamList = {
   Profile: undefined;
   ExploreClubs: undefined;
   MyClubs: { joinedClub?: any } | undefined;
+  NoClubs: undefined;
 };
 
-type MenuScreens = 'Calendar' | 'Events' | 'Announcements';
+type MenuScreens = 'Calendar' | 'Events' | 'Announcements' | 'GroupChat';
 
 type FloatingMenuItem = {
   icon: keyof typeof Ionicons.glyphMap;
   screen: MenuScreens;
+  requiresClub?: boolean;
 };
 
 const BUTTON_SIZE = 60;
 const SPACING = 12; // Gap between buttons
 
 const MENU_ITEMS: FloatingMenuItem[] = [
+  { icon: 'chatbubbles-outline', screen: 'GroupChat', requiresClub: true },
   { icon: 'calendar-outline', screen: 'Calendar' },
   { icon: 'time-outline', screen: 'Events' },
   { icon: 'megaphone-outline', screen: 'Announcements' },
@@ -46,6 +50,14 @@ const FloatingMenu: React.FC = () => {
   const animation = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const isFocused = useIsFocused();
+  const { joinedClubs } = useJoinedClubs();
+
+  // Hide FAB in GroupChat screen
+  const state = navigation.getState();
+  const currentRoute = state?.routes?.[state?.index ?? 0];
+  if (currentRoute?.name === 'GroupChat') {
+    return null;
+  }
 
   // Close menu when screen loses focus
   useEffect(() => {
@@ -95,7 +107,7 @@ const FloatingMenu: React.FC = () => {
     };
   };
 
-  const handleNavigation = (screen: MenuScreens) => {
+  const handleNavigation = (item: FloatingMenuItem) => {
     setIsOpen(false);
     Animated.spring(animation, {
       toValue: 0,
@@ -103,11 +115,25 @@ const FloatingMenu: React.FC = () => {
       tension: 40,
       useNativeDriver: true,
     }).start(() => {
-      navigation.dispatch(
-        CommonActions.navigate({
-          name: screen
-        })
-      );
+      if (item.screen === 'GroupChat') {
+        if (joinedClubs && joinedClubs.length > 0) {
+          const firstClub = joinedClubs[0];
+          if ('id' in firstClub && 'name' in firstClub) {
+            navigation.navigate('GroupChat', {
+              clubId: firstClub.id,
+              clubName: firstClub.name
+            });
+          }
+        } else {
+          navigation.navigate('NoClubs');
+        }
+      } else if (!item.requiresClub) {
+        navigation.dispatch(
+          CommonActions.navigate({
+            name: item.screen
+          })
+        );
+      }
     });
   };
 
@@ -125,7 +151,7 @@ const FloatingMenu: React.FC = () => {
         >
           <TouchableOpacity
             style={[styles.button, styles.menuButton]}
-            onPress={() => handleNavigation(item.screen)}
+            onPress={() => handleNavigation(item)}
             activeOpacity={0.8}
           >
             <Ionicons name={item.icon} size={24} color="#fff" />

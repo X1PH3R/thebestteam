@@ -34,6 +34,7 @@ import AllMembersScreen from './src/screens/AllMembersScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import AnnouncementsScreen from './src/screens/AnnouncementsScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import NoClubsScreen from './src/screens/NoClubsScreen';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -54,6 +55,7 @@ type RootStackParamList = {
   Profile: undefined;
   ExploreClubs: undefined;
   MyClubs: { joinedClub?: any } | undefined;
+  NoClubs: undefined;
 };
 
 type TabParamList = {
@@ -423,6 +425,14 @@ const AppContent: React.FC = () => {
                 component={AnnouncementsScreen}
                 options={{
                   title: 'Announcements',
+                  headerShown: true,
+                }}
+              />
+              <Stack.Screen 
+                name="NoClubs" 
+                component={NoClubsScreen}
+                options={{
+                  title: 'No Clubs',
                   headerShown: true,
                 }}
               />

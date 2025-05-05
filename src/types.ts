@@ -20,12 +20,13 @@ export type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export interface User {
   id: string;
+  uid: string;
   email: string;
-  displayName?: string;
-  photoURL?: string;
-  description?: string;
-  year?: string;
+  displayName: string;
+  photoURL: string;
   major?: string;
+  year?: string;
+  description?: string;
   instagram?: string;
   linkedin?: string;
   twitter?: string;

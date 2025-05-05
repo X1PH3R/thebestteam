@@ -5,9 +5,35 @@ import { useJoinedClubs } from '../context/JoinedClubsContext';
 import { useTheme } from '../context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../types';
+import type { CompositeNavigationProp } from '@react-navigation/native';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { LinearGradient } from 'expo-linear-gradient';
 import { CommonActions } from '@react-navigation/native';
+
+type TabParamList = {
+  Explore: undefined;
+  MyClubs: undefined;
+  Profile: undefined;
+};
+
+type RootStackParamList = {
+  MainTabs: undefined;
+  Calendar: undefined;
+  Events: undefined;
+  Announcements: undefined;
+  ClubDetails: { club: any };
+  GroupChat: { clubId: string; clubName: string };
+  AllMembers: { members: any[]; clubName: string };
+  MemberProfile: { member: any };
+  CreateProfile: undefined;
+  Settings: undefined;
+  Profile: undefined;
+};
+
+type NavigationProp = CompositeNavigationProp<
+  NativeStackNavigationProp<RootStackParamList>,
+  BottomTabNavigationProp<TabParamList>
+>;
 
 // Mock announcements data with images
 const mockAnnouncements = [
@@ -58,7 +84,7 @@ const mockAnnouncements = [
 ];
 
 const AnnouncementsScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NavigationProp>();
   const { joinedClubs } = useJoinedClubs();
   const { theme } = useTheme();
   const [announcements, setAnnouncements] = useState(mockAnnouncements.map(announcement => ({
@@ -117,8 +143,17 @@ const AnnouncementsScreen = () => {
 
   const handleExplorePress = () => {
     navigation.dispatch(
-      CommonActions.navigate({
-        name: 'ExploreClubs'
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'MainTabs',
+            state: {
+              index: 0,
+              routes: [{ name: 'Explore' }]
+            }
+          }
+        ]
       })
     );
   };

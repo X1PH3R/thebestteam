@@ -1,25 +1,38 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, CommonActions } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useJoinedClubs } from '../context/JoinedClubsContext';
 import { useTheme } from '../context/ThemeContext';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { Club } from '../types';
 
 type RootStackParamList = {
-  Home: undefined;
   GroupChat: { clubId: string; clubName: string };
   ClubDetails: { club: Club };
-  ExploreClubs: undefined;
 };
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type TabParamList = {
+  ExploreTab: undefined;
+  MyClubsTab: undefined;
+  ProfileTab: undefined;
+};
+
+type NavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<TabParamList>,
+  NativeStackNavigationProp<RootStackParamList>
+>;
 
 const MyClubsScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const { joinedClubs } = useJoinedClubs();
   const { theme } = useTheme();
+
+  const navigateToExplore = () => {
+    navigation.navigate('ExploreTab');
+  };
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -74,7 +87,7 @@ const MyClubsScreen = () => {
         <Text style={[styles.emptyText, { color: theme.textSecondary }]}>Join clubs to see them here</Text>
         <TouchableOpacity 
           style={[styles.exploreButton, { backgroundColor: theme.primary }]}
-          onPress={() => navigation.navigate('ExploreClubs')}
+          onPress={navigateToExplore}
         >
           <Text style={styles.exploreButtonText}>Explore Clubs</Text>
         </TouchableOpacity>
